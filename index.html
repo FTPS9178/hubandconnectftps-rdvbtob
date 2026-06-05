@@ -425,6 +425,14 @@ function subscribeRealtime(){
   }).subscribe();
 }
 
+function checkNavMode(){
+  var isMobile=window.innerWidth<=700;
+  var desktop=ge('navLinks');
+  var hamburger=ge('hamburgerBtn');
+  if(desktop){desktop.style.display=isMobile?'none':'flex';}
+  if(hamburger){hamburger.style.display=isMobile?'block':'none';}
+}
+
 function renderNav(){
   var links={
     admin:[{id:'dashboard',label:'📊 Dashboard'},{id:'partners',label:'🏢 Partenaires'},{id:'startups',label:'🚀 Start-up'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'planning',label:'📅 Planning'},{id:'myAccount',label:'👤 Mon compte'}],
@@ -437,9 +445,38 @@ function renderNav(){
   var mbtns=(links[state.role]||[]).map(function(l){
     return '<button onclick="navigateTo(\''+l.id+'\')" id="mav_'+l.id+'" style="display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;padding:11px 14px;border-radius:6px;font-size:.9rem;text-align:left;">'+l.label+'</button>';
   }).join('');
-  ge('navLinks').innerHTML=btns;
-  ge('navLinksMobile').innerHTML=mbtns;
+  var desktop=ge('navLinks');
+  var mobile=ge('navLinksMobile');
+  if(desktop)desktop.innerHTML=btns;
+  if(mobile)mobile.innerHTML=mbtns;
   checkNavMode();
+  window.removeEventListener('resize',checkNavMode);
+  window.addEventListener('resize',checkNavMode);
+}
+
+function toggleMenu(){
+  var m=ge('navLinksMobile');
+  if(m)m.style.display=m.style.display==='block'?'none':'block';
+}
+
+function navigateTo(page){
+  var m=ge('navLinksMobile');
+  if(m)m.style.display='none';
+  var desktop=ge('navLinks');
+  var mobile=ge('navLinksMobile');
+  if(desktop)desktop.querySelectorAll('button').forEach(function(b){b.style.background='none';b.style.color='#ccc';});
+  if(mobile)mobile.querySelectorAll('button').forEach(function(b){b.style.background='none';b.style.color='#ccc';});
+  var btn=ge('nav_'+page);if(btn){btn.style.background='var(--red)';btn.style.color='#fff';}
+  var mbtn=ge('mav_'+page);if(mbtn){mbtn.style.background='var(--red)';mbtn.style.color='#fff';}
+  var pc=ge('pageContainer');
+  if(!pc)return;
+  pc.innerHTML='';
+  var div=document.createElement('div');
+  div.className='page active';
+  div.dataset.page=page;
+  pc.appendChild(div);
+  var pages={dashboard:pgDashboard,partners:pgPartners,startups:pgStartups,conferences:pgConferences,crashtest:pgCrashTest,planning:pgPlanning,myPlanning:pgMyPlanning,myRdv:pgMyRdv,myRdvStartup:pgMyRdvStartup,myAgenda:pgMyAgenda,myPDF:pgMyPDF,myAccount:pgMyAccount};
+  if(pages[page]){pages[page](div);}
 }
 
 function toggleMenu(){
