@@ -390,7 +390,7 @@ function loadUser(user){
 }
 
 function finishLoad(profile){
-  ge('userLabel').textContent=profile.name||state.user.email;
+  var lbl=ge('userLabel');if(lbl)lbl.textContent=profile.name||state.user.email;
   showPage('app');renderNav();loadTicker();
   navigateTo(profile.role==='admin'?'dashboard':profile.role==='partner'?'myPlanning':'partners');
   subscribeRealtime();
@@ -432,21 +432,28 @@ function renderNav(){
     startup:[{id:'partners',label:'🏢 RDV'},{id:'myRdvStartup',label:'📋 Mes RDV'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'myAgenda',label:'📅 Agenda'},{id:'myPDF',label:'📄 PDF'},{id:'myAccount',label:'👤 Mon compte'}]
   };
   var btns=(links[state.role]||[]).map(function(l){
-    return '<button onclick="navigateTo(\''+l.id+'\')" id="nav_'+l.id+'">'+l.label+'</button>';
+    return '<button onclick="navigateTo(\''+l.id+'\')" id="nav_'+l.id+'" style="background:none;border:none;color:#ccc;cursor:pointer;padding:6px 9px;border-radius:6px;font-size:.76rem;white-space:nowrap;">'+l.label+'</button>';
+  }).join('');
+  var mbtns=(links[state.role]||[]).map(function(l){
+    return '<button onclick="navigateTo(\''+l.id+'\')" id="mav_'+l.id+'" style="display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;padding:11px 14px;border-radius:6px;font-size:.9rem;text-align:left;">'+l.label+'</button>';
   }).join('');
   ge('navLinks').innerHTML=btns;
-  ge('navLinksMobile').innerHTML=btns.replace(/id="nav_/g,'id="mav_');
+  ge('navLinksMobile').innerHTML=mbtns;
+  checkNavMode();
 }
 
 function toggleMenu(){
-  ge('navLinksMobile').classList.toggle('open');
+  var m=ge('navLinksMobile');
+  m.style.display=m.style.display==='block'?'none':'block';
 }
 
 function navigateTo(page){
-  ge('navLinksMobile').classList.remove('open');
-  document.querySelectorAll('#navLinks button,#navLinksMobile button').forEach(function(b){b.classList.remove('active');});
-  var btn=ge('nav_'+page);if(btn)btn.classList.add('active');
-  var mbtn=ge('mav_'+page);if(mbtn)mbtn.classList.add('active');
+  var m=ge('navLinksMobile');if(m)m.style.display='none';
+  document.querySelectorAll('#navLinks button,#navLinksMobile button').forEach(function(b){
+    b.style.background='none';b.style.color='#ccc';
+  });
+  var btn=ge('nav_'+page);if(btn){btn.style.background='var(--red)';btn.style.color='#fff';}
+  var mbtn=ge('mav_'+page);if(mbtn){mbtn.style.background='var(--red)';mbtn.style.color='#fff';}
   ge('pageContainer').innerHTML='';
   var div=document.createElement('div');div.className='page active';div.dataset.page=page;
   ge('pageContainer').appendChild(div);
