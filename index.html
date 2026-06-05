@@ -40,9 +40,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--red);}
 .btn-sm{padding:4px 10px;font-size:.76rem;}
 .btn-group{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-@media(max-width:700px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}.page{padding:14px;}}
+@media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr;}.page{padding:14px;}}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--dark) 0%,#16213e 100%);}
 .login-box{background:#fff;border-radius:16px;padding:36px;width:420px;box-shadow:0 8px 40px rgba(0,0,0,.2);}
 .tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:2px solid var(--border);}
@@ -91,7 +90,7 @@ td{padding:7px 10px;border-bottom:1px solid var(--border);}
 </head>
 <body>
 
-<div id="loginPage" style="display:block;">
+<div id="loginPage">
   <div class="login-wrap">
     <div class="login-box">
       <div style="text-align:center;margin-bottom:20px;">
@@ -102,19 +101,7 @@ td{padding:7px 10px;border-bottom:1px solid var(--border);}
         <button class="tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</button>
         <button class="tab" id="tabRegister" onclick="switchTab('register')">S'inscrire</button>
       </div>
-      <div id="authForm">
-        <div class="form-group"><label>Email</label><input id="aEmail" type="email" placeholder="votre@email.fr"/></div>
-        <div class="form-group"><label>Mot de passe</label>
-          <div class="pw-wrap">
-            <input id="aPass" type="password" placeholder="••••••••"/>
-            <button class="pw-eye" onclick="togglePw('aPass',this)" type="button">👁</button>
-          </div>
-        </div>
-        <button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="doLogin()">Se connecter →</button>
-        <div style="text-align:center;margin-top:10px;">
-          <a href="#" onclick="showForgot();return false;" style="color:var(--red);font-size:.82rem;">Mot de passe oublié ?</a>
-        </div>
-      </div>
+      <div id="authForm"></div>
       <div id="authMsg"></div>
     </div>
   </div>
@@ -132,9 +119,7 @@ td{padding:7px 10px;border-bottom:1px solid var(--border);}
   <div id="pageContainer"></div>
   <div class="ticker-wrap">
     <span style="color:#aaa;font-size:.78rem;padding:0 16px;white-space:nowrap;flex-shrink:0;">Ils seront présents :</span>
-    <div style="overflow:hidden;flex:1;">
-      <div class="ticker-inner" id="tickerInner"></div>
-    </div>
+    <div style="overflow:hidden;flex:1;"><div class="ticker-inner" id="tickerInner"></div></div>
   </div>
 </div>
 
@@ -183,7 +168,7 @@ function showForgot(){
 function sendReset(){
   var email=val('aEmail');
   if(!email){setMsg('Entrez votre email.','warn');return;}
-  sb.auth.resetPasswordForEmail(email,{redirectTo:'https://lafrenchtech-paris-saclay.fr/matchmaking'}).then(function(r){
+  sb.auth.resetPasswordForEmail(email,{redirectTo:'https://ftps9178.github.io/matching-ftps-rdvbtob/'}).then(function(r){
     setMsg(r.error?'❌ '+r.error.message:'✅ Email envoyé !',r.error?'error':'success');
   });
 }
@@ -204,8 +189,7 @@ function showRegFields(role,el){
   sb.from(role==='partner'?'partners':'startups').select('id,name').order('name').then(function(res){
     var existing=res.data||[];
     ge('regFields').innerHTML=
-      '<div class="form-group"><label>Prénom</label><input id="rPrenom" placeholder="Prénom"/></div>'+
-      '<div class="form-group"><label>Nom</label><input id="rNom" placeholder="Nom"/></div>'+
+      '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label><input id="rContact" placeholder="Ex: Marie Dupont"/></div>'+
       '<div class="form-group"><label>Email</label><input id="rEmail" type="email" placeholder="votre@email.fr"/></div>'+
       '<div class="form-group"><label>Mot de passe</label><div class="pw-wrap"><input id="rPass" type="password" placeholder="Min. 6 caractères"/><button class="pw-eye" onclick="togglePw(\'rPass\',this)" type="button">👁</button></div></div>'+
       '<div class="form-group"><label>Confirmer</label><div class="pw-wrap"><input id="rPass2" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'rPass2\',this)" type="button">👁</button></div></div>'+
@@ -220,14 +204,12 @@ function showRegFields(role,el){
       '<div class="form-group"><label>Secteur</label><select id="rSecteur"><option value="">-- Choisissez --</option>'+
       sectors.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
       '<div class="form-group"><label>Description</label><textarea id="rDesc" rows="2"></textarea></div>'+
-      '<div class="form-group"><label>🔗 LinkedIn</label><input id="rLinkedin" placeholder="https://linkedin.com/company/..."/></div>'+
-      '<div class="form-group"><label>🌐 Site web</label><input id="rWebsite" placeholder="https://www.monsite.fr"/></div>'+
       '<div class="form-group"><label>Logo</label><input type="file" id="rLogo" accept="image/*"/></div>'+
       '</div>'+
       '<div class="form-group" style="margin-top:8px;">'+
       '<label style="display:flex;align-items:flex-start;gap:8px;font-weight:normal;cursor:pointer;">'+
       '<input type="checkbox" id="rRgpd" style="width:auto;margin-top:3px;flex-shrink:0;"/>'+
-      '<span style="font-size:.8rem;">J\'accepte que mes données personnelles soient collectées et traitées dans le cadre de l\'événement B2B Matchmaking 2026 de La French Tech Paris-Saclay, conformément à notre <a href="#" onclick="showRgpd();return false;" style="color:var(--red);">politique de confidentialité</a>.</span>'+
+      '<span style="font-size:.8rem;">J\'accepte que mes données soient traitées dans le cadre du B2B Matchmaking 2026 conformément à notre <a href="#" onclick="showRgpd();return false;" style="color:var(--red);">politique de confidentialité</a>.</span>'+
       '</label></div>'+
       '<button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="doRegister(\''+role+'\')">S\'inscrire →</button>';
   });
@@ -240,25 +222,20 @@ function doLogin(){
   if(!email||!pass){setMsg('Remplissez tous les champs.','warn');return;}
   setMsg('Connexion...','info');
   sb.auth.signInWithPassword({email:email,password:pass}).then(function(res){
-    if(res.error){
-      var m=res.error.message;
-      if(m.indexOf('Invalid')>=0||m.indexOf('credentials')>=0)m='Mot de passe incorrect.';
-      setMsg('❌ '+m,'error');return;
-    }
+    if(res.error){setMsg('❌ Mot de passe incorrect.','error');return;}
     setMsg('');loadUser(res.data.user);
   });
 }
 
 function doRegister(role){
-  var prenom=val('rPrenom'),nom=val('rNom'),email=val('rEmail'),pass=val('rPass'),pass2=val('rPass2');
+  var contact=val('rContact'),email=val('rEmail'),pass=val('rPass'),pass2=val('rPass2');
   var existingId=val('rExisting'),societe=val('rSociete'),secteur=val('rSecteur'),desc=val('rDesc');
-  if(!prenom||!nom||!email||!pass){setMsg('Remplissez tous les champs.','warn');return;}
-  if(!ge('rRgpd')||!ge('rRgpd').checked){setMsg('Vous devez accepter la politique de confidentialité.','warn');return;}
+  if(!contact||!email||!pass){setMsg('Remplissez tous les champs.','warn');return;}
   if(!existingId&&(!societe||!secteur)){setMsg('Renseignez la société et le secteur.','warn');return;}
   if(pass!==pass2){setMsg('Mots de passe différents.','warn');return;}
   if(pass.length<6){setMsg('Mot de passe trop court.','warn');return;}
+  if(!ge('rRgpd')||!ge('rRgpd').checked){setMsg('Vous devez accepter la politique de confidentialité.','warn');return;}
   setMsg('Création...','info');
-  var contact=prenom+' '+nom;
   var file=ge('rLogo')&&ge('rLogo').files&&ge('rLogo').files[0];
   function proceed(logoUrl){
     sb.auth.signUp({email:email,password:pass}).then(function(res){
@@ -274,9 +251,6 @@ function doRegister(role){
           var tbl=role==='partner'?'partners':'startups';
           var data={profile_id:uid,name:societe,sector:secteur,contact:contact,email:email,description:desc,is_vc:false};
           if(logoUrl)data.logo_url=logoUrl;
-          var linkedin=val('rLinkedin'),website=val('rWebsite');
-          if(linkedin)data.linkedin_url=linkedin;
-          if(website)data.website_url=website;
           sb.from(tbl).insert(data).select().single().then(function(r){
             if(r.data){
               var mt=role==='partner'?'partner_members':'startup_members';
@@ -292,7 +266,7 @@ function doRegister(role){
     });
   }
   if(file){
-    var path=(role==='partner'?'p':'s')+'_'+Date.now()+'_'+file.name;
+    var path=(role==='partner'?'p':'s')+'_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
     sb.storage.from('logos').upload(path,file).then(function(r){proceed(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
   } else {proceed(null);}
 }
@@ -312,16 +286,14 @@ function loadUser(user){
     if(profile.role==='partner'){
       sb.from('partner_members').select('partners(*)').eq('profile_id',user.id).single().then(function(r){
         state.partner=(r.data&&r.data.partners)||null;
-        if(!state.partner){
-          sb.from('partners').select('*').eq('profile_id',user.id).single().then(function(r2){state.partner=r2.data||null;finishLoad(profile);});
-        } else {finishLoad(profile);}
+        if(!state.partner){sb.from('partners').select('*').eq('profile_id',user.id).single().then(function(r2){state.partner=r2.data||null;finishLoad(profile);});}
+        else{finishLoad(profile);}
       });
     } else if(profile.role==='startup'){
       sb.from('startup_members').select('startups(*)').eq('profile_id',user.id).single().then(function(r){
         state.startup=(r.data&&r.data.startups)||null;
-        if(!state.startup){
-          sb.from('startups').select('*').eq('profile_id',user.id).single().then(function(r2){state.startup=r2.data||null;finishLoad(profile);});
-        } else {finishLoad(profile);}
+        if(!state.startup){sb.from('startups').select('*').eq('profile_id',user.id).single().then(function(r2){state.startup=r2.data||null;finishLoad(profile);});}
+        else{finishLoad(profile);}
       });
     } else {finishLoad(profile);}
   });
@@ -337,12 +309,12 @@ function finishLoad(profile){
 function checkSession(){
   sb.auth.getSession().then(function(res){
     if(res.data&&res.data.session){loadUser(res.data.session.user);}
+    else{showLogin();}
   });
 }
 
 function initSlots(partnerId){
-  var rows=TIMES.map(function(t){return {partner_id:partnerId,time:t,status:'free'};});
-  sb.from('slots').insert(rows);
+  sb.from('slots').insert(TIMES.map(function(t){return {partner_id:partnerId,time:t,status:'free'};}));
 }
 
 function loadTicker(){
@@ -352,9 +324,7 @@ function loadTicker(){
   ]).then(function(r){
     var inner=ge('tickerInner');if(!inner)return;
     var all=(r[0].data||[]).concat(r[1].data||[]);
-    inner.innerHTML=all.length?all.map(function(x){
-      return '<img src="'+x.logo_url+'" class="ticker-logo" title="'+x.name+'" onerror="this.style.display=\'none\'"/>';
-    }).join(''):'';
+    inner.innerHTML=all.map(function(x){return '<img src="'+x.logo_url+'" class="ticker-logo" title="'+x.name+'" onerror="this.style.display=\'none\'"/>';}).join('');
   });
 }
 
@@ -382,8 +352,7 @@ function navigateTo(page){
   ge('pageContainer').innerHTML='';
   var div=document.createElement('div');div.className='page active';div.dataset.page=page;
   ge('pageContainer').appendChild(div);
-  var pages={dashboard:pgDashboard,partners:pgPartners,startups:pgStartups,conferences:pgConferences,crashtest:pgCrashTest,planning:pgPlanning,myPlanning:pgMyPlanning,myRdv:pgMyRdv,myRdvStartup:pgMyRdvStartup,myAgenda:pgMyAgenda,myPDF:pgMyPDF,myAccount:pgMyAccount};
-  if(pages[page]){pages[page](div);}
+  ({dashboard:pgDashboard,partners:pgPartners,startups:pgStartups,conferences:pgConferences,crashtest:pgCrashTest,planning:pgPlanning,myPlanning:pgMyPlanning,myRdv:pgMyRdv,myRdvStartup:pgMyRdvStartup,myAgenda:pgMyAgenda,myPDF:pgMyPDF,myAccount:pgMyAccount})[page](div);
 }
 
 // === DASHBOARD ===
@@ -408,17 +377,14 @@ function pgDashboard(el){
         (nbPend>0?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ RDV à valider</h2>'+
         '<div style="overflow-x:auto;"><table><tr><th>Heure</th><th>Partenaire</th><th>Start-up</th><th>Commentaire</th><th>Pitch</th><th>Action</th></tr>'+
         pend.map(function(s){
-          var pname=(s.partners?s.partners.name:'-')+(s.partners&&s.partners.is_vc?'<span class="badge badge-vc">VC</span>':'');
           var su=s.startups||{};
           var displayName=su.contact&&su.contact.trim()?su.contact:su.email||'-';
-          return '<tr><td>'+s.time+'</td><td>'+pname+'</td>'+
+          return '<tr><td>'+s.time+'</td><td>'+(s.partners?s.partners.name:'-')+(s.partners&&s.partners.is_vc?'<span class="badge badge-vc">VC</span>':'')+'</td>'+
             '<td>'+(su.name||'-')+' — '+displayName+'</td>'+
             '<td style="font-size:.76rem;">'+(s.comment||'—')+'</td>'+
             '<td>'+(s.pitch_deck_url?'<a href="'+s.pitch_deck_url+'" target="_blank" class="btn btn-sm btn-outline">📄</a>':'—')+'</td>'+
-            '<td style="white-space:nowrap;">'+
-            '<button class="btn btn-green btn-sm" onclick="adminValidate(\''+s.id+'\')">✅</button> '+
-            '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'admin\')">❌</button>'+
-            '</td></tr>';
+            '<td><button class="btn btn-green btn-sm" onclick="adminValidate(\''+s.id+'\')">✅</button> '+
+            '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'admin\')">❌</button></td></tr>';
         }).join('')+'</table></div></div>':'');
     });
   });
@@ -427,168 +393,109 @@ function pgDashboard(el){
 function adminValidate(id){sb.from('slots').update({status:'booked'}).eq('id',id).then(function(){alert('✅ RDV validé !');navigateTo('dashboard');});}
 
 function openRefuse(slotId,who){
-  showModal(
-    '<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
-    '<h2>Refuser / Annuler le RDV</h2>'+
-    '<button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
-    '<div class="form-group"><label>Motif <span style="color:var(--red);">*</span></label>'+
-    '<textarea id="refuseComment" rows="3" placeholder="Expliquez le motif..."></textarea></div>'+
-    '<div class="btn-group">'+
-    '<button class="btn btn-primary" onclick="confirmRefuse(\''+slotId+'\',\''+who+'\')">Confirmer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>'
-  );
+  showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>Refuser / Annuler</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
+    '<div class="form-group"><label>Motif *</label><textarea id="refuseComment" rows="3"></textarea></div>'+
+    '<div class="btn-group"><button class="btn btn-primary" onclick="confirmRefuse(\''+slotId+'\',\''+who+'\')">Confirmer</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
 
 function confirmRefuse(slotId,who){
-  var comment=val('refuseComment');
-  if(!comment){alert('Le motif est obligatoire.');return;}
+  var comment=val('refuseComment');if(!comment){alert('Le motif est obligatoire.');return;}
   sb.from('slots').update({status:'free',startup_id:null,refusal_comment:comment,comment:null,pitch_deck_url:null,cancelled_by:who}).eq('id',slotId).then(function(){
-    closeModal();alert('RDV refusé/annulé.');
-    if(who==='partner'){navigateTo('myRdv');}
-    else if(who==='startup'){navigateTo('myRdvStartup');}
-    else{navigateTo('dashboard');}
+    closeModal();alert('RDV refusé.');
+    if(who==='partner'){navigateTo('myRdv');}else if(who==='startup'){navigateTo('myRdvStartup');}else{navigateTo('dashboard');}
   });
 }
 
 // === MON COMPTE ===
 function pgMyAccount(el){
   spinEl(el);
-  // ✅ Toujours recharger les données fraîches depuis Supabase
   var tbl=state.role==='partner'?'partners':'startups';
-  var memberTbl=state.role==='partner'?'partner_members':'startup_members';
-
   sb.from(tbl).select('*').eq('profile_id',state.user.id).single().then(function(re){
-    var entity=null;
-    if(!re.error&&re.data){
-      entity=re.data;
-      if(state.role==='partner'){state.partner=entity;}
-      else{state.startup=entity;}
-    } else {
-      entity=state.role==='partner'?state.partner:state.startup;
-    }
-
-    // Recharger le profil aussi
-    sb.from('profiles').select('*').eq('id',state.user.id).single().then(function(rp){
-      if(!rp.error&&rp.data){state.profile=rp.data;}
-      var contactSource=entity?entity.contact:(profile.contact||'');
-
-      el.innerHTML='<h1>Mon compte</h1><div class="subtitle">Gérez vos informations</div>'+
-        '<div class="card">'+
-        '<h2>👤 Informations personnelles</h2>'+
-        '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label><input id="acContact" value="'+contactSource+'" placeholder="Ex: Marie Dupont"/></div>'+
-        '<hr style="margin:14px 0;border-color:var(--border);">'+
-        '<h2>'+(state.role==='partner'?'🏢 Mon entreprise':'🚀 Ma start-up')+'</h2>'+
-        (entity&&entity.logo_url?'<div style="margin-bottom:12px;"><img src="'+entity.logo_url+'" style="height:56px;border-radius:8px;border:1px solid var(--border);"/></div>':'')+
-        '<div class="grid2">'+
-        '<div class="form-group"><label>Société</label><input id="acSociete" value="'+(entity?entity.name:'')+'"/></div>'+
-        '<div class="form-group"><label>Secteur</label><select id="acSector">'+
-        (state.role==='partner'?PSECTORS:SSECTORS).map(function(s){return '<option'+(entity&&s===entity.sector?' selected':'')+'>'+s+'</option>';}).join('')+
-        '</select></div>'+
-        '</div>'+
-        '<div class="form-group"><label>Description de l\'activité</label><textarea id="acDesc" rows="3">'+(entity?(entity.activity_description||entity.description||''):'')+'</textarea></div>'+
-        '<div class="form-group"><label>🔗 LinkedIn</label><input id="acLinkedin" value="'+(entity&&entity.linkedin_url||'')+'" placeholder="https://linkedin.com/company/..."/></div>'+
-        '<div class="form-group"><label>🌐 Site web</label><input id="acWebsite" value="'+(entity&&entity.website_url||'')+'" placeholder="https://www.monsite.fr"/></div>'+
-        '<div class="form-group"><label>Logo</label><input type="file" id="acLogo" accept="image/*"/></div>'+
-        '<hr style="margin:14px 0;border-color:var(--border);">'+
-        '<h2>🔐 Mot de passe</h2>'+
-        '<div class="grid2">'+
-        '<div class="form-group"><label>Nouveau mot de passe <span style="color:var(--muted);font-size:.76rem;">(laisser vide pour ne pas changer)</span></label>'+
-        '<div class="pw-wrap"><input id="acPass" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'acPass\',this)" type="button">👁</button></div></div>'+
-        '<div class="form-group"><label>Confirmer</label>'+
-        '<div class="pw-wrap"><input id="acPass2" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'acPass2\',this)" type="button">👁</button></div></div>'+
-        '</div>'+
-        '<button class="btn btn-primary" id="btnSaveAccount">💾 Enregistrer</button>'+
-        '<hr style="margin:20px 0;border-color:var(--border);">'+
-        '<h2>🔒 Confidentialité & RGPD</h2>'+
-        '<p style="font-size:.82rem;color:#555;margin-bottom:12px;">Conformément au RGPD, vous pouvez consulter notre politique de confidentialité ou demander la suppression de vos données.</p>'+
-        '<div class="btn-group">'+
-        '<button class="btn btn-outline btn-sm" onclick="showRgpd()">📄 Politique de confidentialité</button>'+
-        '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteMyAccount()">🗑 Supprimer mon compte</button>'+
-        '</div>'+
-        '</div>';
-
-      setTimeout(function(){
-        var btn=ge('btnSaveAccount');
-        if(btn){btn.addEventListener('click',function(){saveAccount();});}
-      },100);
-    });
+    var entity=(!re.error&&re.data)?re.data:(state.role==='partner'?state.partner:state.startup);
+    if(entity){if(state.role==='partner'){state.partner=entity;}else{state.startup=entity;}}
+    var contactVal=entity?entity.contact:(state.profile.contact||'');
+    el.innerHTML='<h1>Mon compte</h1><div class="subtitle">Gérez vos informations</div><div class="card">'+
+      '<h2>👤 Informations personnelles</h2>'+
+      '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label>'+
+      '<input id="acContact" value="'+contactVal+'" placeholder="Ex: Marie Dupont"/></div>'+
+      '<hr style="margin:14px 0;border-color:var(--border);">'+
+      '<h2>'+(state.role==='partner'?'🏢 Mon entreprise':'🚀 Ma start-up')+'</h2>'+
+      (entity&&entity.logo_url?'<div style="margin-bottom:12px;"><img src="'+entity.logo_url+'" style="height:56px;border-radius:8px;border:1px solid var(--border);"/></div>':'')+
+      '<div class="grid2">'+
+      '<div class="form-group"><label>Société</label><input id="acSociete" value="'+(entity?entity.name:'')+'"/></div>'+
+      '<div class="form-group"><label>Secteur</label><select id="acSector">'+
+      (state.role==='partner'?PSECTORS:SSECTORS).map(function(s){return '<option'+(entity&&s===entity.sector?' selected':'')+'>'+s+'</option>';}).join('')+
+      '</select></div></div>'+
+      '<div class="form-group"><label>Description</label><textarea id="acDesc" rows="3">'+(entity?(entity.activity_description||entity.description||''):'')+'</textarea></div>'+
+      '<div class="form-group"><label>🔗 LinkedIn</label><input id="acLinkedin" value="'+(entity&&entity.linkedin_url||'')+'" placeholder="https://linkedin.com/company/..."/></div>'+
+      '<div class="form-group"><label>🌐 Site web</label><input id="acWebsite" value="'+(entity&&entity.website_url||'')+'" placeholder="https://www.monsite.fr"/></div>'+
+      '<div class="form-group"><label>Logo</label><input type="file" id="acLogo" accept="image/*"/></div>'+
+      '<hr style="margin:14px 0;border-color:var(--border);">'+
+      '<h2>🔐 Mot de passe</h2>'+
+      '<div class="grid2">'+
+      '<div class="form-group"><label>Nouveau mot de passe <span style="color:var(--muted);font-size:.76rem;">(laisser vide = pas de changement)</span></label>'+
+      '<div class="pw-wrap"><input id="acPass" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'acPass\',this)" type="button">👁</button></div></div>'+
+      '<div class="form-group"><label>Confirmer</label>'+
+      '<div class="pw-wrap"><input id="acPass2" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'acPass2\',this)" type="button">👁</button></div></div></div>'+
+      '<button class="btn btn-primary" id="btnSave">💾 Enregistrer</button>'+
+      '<hr style="margin:20px 0;border-color:var(--border);">'+
+      '<h2>🔒 RGPD</h2>'+
+      '<div class="btn-group">'+
+      '<button class="btn btn-outline btn-sm" onclick="showRgpd()">📄 Politique de confidentialité</button>'+
+      '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteMyAccount()">🗑 Supprimer mon compte</button>'+
+      '</div></div>';
+    ge('btnSave').addEventListener('click',saveAccount);
   });
 }
 
-// ✅ saveAccount corrigé — pas d'appel auth inutile
 function saveAccount(){
   var contact=val('acContact').trim();
   var societe=val('acSociete'),sector=val('acSector'),desc=val('acDesc');
   var pass=val('acPass'),pass2=val('acPass2');
-  if(!contact){alert('Prénom et nom obligatoires.');return;}
+  if(!contact){alert('Le contact est obligatoire.');return;}
   if(pass&&pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
-  if(pass&&pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
-  var fileInput=ge('acLogo');
-  var file=fileInput&&fileInput.files&&fileInput.files.length>0?fileInput.files[0]:null;
-
-  function doSave(logoUrl){
-    // Mise à jour password si saisi
-    if(pass){sb.auth.updateUser({password:pass});}
-
-    // Mise à jour profiles
-    sb.from('profiles').update({contact:contact,name:societe,sector:sector}).eq('id',state.user.id);
-
-    // Chercher l'entité par profile_id
-    var tbl=state.role==='partner'?'partners':'startups';
-    var entity=state.role==='partner'?state.partner:state.startup;
-
-    if(entity&&entity.id){
-      doEntityUpdate(entity,tbl,logoUrl,contact,societe,sector,desc);
-    } else {
-      // Fallback : chercher en base
-      sb.from(tbl).select('*').eq('profile_id',state.user.id).single().then(function(re){
-        if(!re.error&&re.data){
-          doEntityUpdate(re.data,tbl,logoUrl,contact,societe,sector,desc);
-        } else {
-          var memberTbl=state.role==='partner'?'partner_members':'startup_members';
-          sb.from(memberTbl).select(tbl+'(*)').eq('profile_id',state.user.id).single().then(function(rm){
-            var ent=rm.data&&rm.data[tbl]?rm.data[tbl]:null;
-            if(ent){doEntityUpdate(ent,tbl,logoUrl,contact,societe,sector,desc);}
-            else{alert('❌ Entité introuvable. Contactez l\'admin.');}
-          });
-        }
-      });
-    }
-  }
-
-  // ✅ N'upload le logo QUE si un fichier est sélectionné
-  if(file){
-    // Nettoyer le nom du fichier (supprimer caractères spéciaux)
-    var cleanName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    var path='logo_'+Date.now()+'_'+cleanName;
-    console.log('Upload logo path:',path);
-    sb.storage.from('logos').upload(path,file,{upsert:true}).then(function(r){
-      if(r.error){
-        console.error('Logo upload error:',r.error.message);
-        doSave(null); // Continue la sauvegarde sans logo
-      } else {
-        doSave(SB_URL+'/storage/v1/object/public/logos/'+path);
-      }
-    });
-  } else {
-    doSave(null);
-  }
-}
-
-function doEntityUpdate(entity,tbl,logoUrl,contact,societe,sector,desc){
-  if(!entity||!entity.id){alert('❌ ID introuvable.');return;}
+  if(pass){sb.auth.updateUser({password:pass});}
   var linkedin=val('acLinkedin'),website=val('acWebsite');
   var eu={name:societe,contact:contact,sector:sector,description:desc,activity_description:desc};
-  if(linkedin!==undefined)eu.linkedin_url=linkedin;
-  if(website!==undefined)eu.website_url=website;
-  if(logoUrl){eu.logo_url=logoUrl;}
-  sb.from(tbl).update(eu).eq('id',entity.id).then(function(r){
-    if(r.error){alert('❌ Erreur : '+r.error.message);return;}
-    if(state.role==='partner'){state.partner=Object.assign({},state.partner,eu);}
-    else{state.startup=Object.assign({},state.startup,eu);}
-    state.profile=Object.assign({},state.profile,{contact:contact,name:societe,sector:sector});
-    ge('userLabel').textContent=societe||state.user.email;
-    alert('✅ Compte mis à jour !');
+  if(linkedin)eu.linkedin_url=linkedin;
+  if(website)eu.website_url=website;
+  var tbl=state.role==='partner'?'partners':'startups';
+  var entity=state.role==='partner'?state.partner:state.startup;
+  sb.from('profiles').update({contact:contact,name:societe,sector:sector}).eq('id',state.user.id);
+  if(entity&&entity.id){
+    sb.from(tbl).update(eu).eq('id',entity.id).then(function(r){
+      if(r.error){alert('❌ Erreur : '+r.error.message);return;}
+      if(state.role==='partner'){state.partner=Object.assign({},state.partner,eu);}
+      else{state.startup=Object.assign({},state.startup,eu);}
+      state.profile=Object.assign({},state.profile,{contact:contact,name:societe,sector:sector});
+      ge('userLabel').textContent=societe||state.user.email;
+      alert('✅ Compte mis à jour !');
+    });
+  } else {alert('❌ Entité introuvable.');}
+}
+
+function showRgpd(){
+  showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>🔒 Politique de confidentialité</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
+    '<div style="font-size:.83rem;line-height:1.6;color:#444;">'+
+    '<p style="margin-bottom:10px;"><strong>Responsable :</strong> La French Tech Paris-Saclay</p>'+
+    '<p style="margin-bottom:10px;"><strong>Données collectées :</strong> Nom, prénom, email, société, secteur, description, logo, pitch deck.</p>'+
+    '<p style="margin-bottom:10px;"><strong>Finalité :</strong> Organisation des RDV B2B Matchmaking 2026.</p>'+
+    '<p style="margin-bottom:10px;"><strong>Durée :</strong> 6 mois après l\'événement.</p>'+
+    '<p style="margin-bottom:10px;"><strong>Vos droits :</strong> Accès, rectification, suppression via <a href="mailto:contact@lafrenchtech-paris-saclay.fr" style="color:var(--red);">contact@lafrenchtech-paris-saclay.fr</a></p>'+
+    '</div>'+
+    '<button class="btn btn-primary" onclick="closeModal()" style="margin-top:14px;width:100%;">J\'ai compris</button>');
+}
+
+function deleteMyAccount(){
+  if(!confirm('⚠️ Supprimer votre compte ? Action irréversible.'))return;
+  var uid=state.user.id;
+  var entity=state.role==='partner'?state.partner:state.startup;
+  var memberTbl=state.role==='partner'?'partner_members':'startup_members';
+  Promise.all([
+    sb.from(memberTbl).delete().eq('profile_id',uid),
+    sb.from('profiles').delete().eq('id',uid)
+  ]).then(function(){
+    sb.auth.signOut().then(function(){alert('✅ Compte supprimé.');showPage('login');showLogin();});
   });
 }
 
@@ -605,14 +512,11 @@ function buildPartners(el,partners,activeFilter){
   var filterBar='<div class="filter-bar">'+sectors.map(function(s){
     return '<button class="filter-btn'+(s===activeFilter?' active':'')+'" onclick="filterPartners(\''+s+'\')">'+s+'</button>';
   }).join('')+'</div>';
-  var adminForm=state.role==='admin'?
-    '<div class="card"><h2>Ajouter un partenaire</h2>'+
-    '<div class="grid2">'+
-    '<div class="form-group"><label>Société</label><input id="pName"/></div>'+
+  var adminForm=state.role==='admin'?'<div class="card"><h2>Ajouter un partenaire</h2>'+
+    '<div class="grid2"><div class="form-group"><label>Société</label><input id="pName"/></div>'+
     '<div class="form-group"><label>Secteur</label><select id="pSector">'+PSECTORS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
     '<div class="form-group"><label>Contact</label><input id="pContact"/></div>'+
-    '<div class="form-group"><label>Email</label><input id="pEmail" type="email"/></div>'+
-    '</div>'+
+    '<div class="form-group"><label>Email</label><input id="pEmail" type="email"/></div></div>'+
     '<div class="form-group"><label>Description</label><textarea id="pDesc" rows="2"></textarea></div>'+
     '<div class="form-group"><label>Logo</label><input type="file" id="pLogo" accept="image/*"/></div>'+
     '<div class="form-group"><label><input type="checkbox" id="pIsVc" style="width:auto;margin-right:6px;"/> Espace VC\'s</label></div>'+
@@ -621,24 +525,21 @@ function buildPartners(el,partners,activeFilter){
     '<div class="subtitle">'+(state.role==='startup'?'Filtrez et réservez votre créneau':'Gérez les partenaires')+'</div>'+
     adminForm+filterBar+
     partners.map(function(p){
-      var pj=encodeURIComponent(JSON.stringify({id:p.id,name:p.name,sector:p.sector||'',contact:p.contact||'',email:p.email||'',is_vc:!!p.is_vc,logo_url:p.logo_url||'',activity_description:p.activity_description||p.description||''}));
+      var pj=encodeURIComponent(JSON.stringify({id:p.id,name:p.name,sector:p.sector||'',contact:p.contact||'',email:p.email||'',is_vc:!!p.is_vc,logo_url:p.logo_url||'',description:p.description||''}));
       return '<div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.06);">'+
         '<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;">'+
         (p.logo_url?'<img src="'+p.logo_url+'" class="partner-logo"/>':'<div class="partner-logo" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🏢</div>')+
         '<div style="flex:1;min-width:0;">'+
         '<div style="font-weight:700;">'+p.name+' <span class="badge badge-red">'+(p.sector||'')+'</span>'+(p.is_vc?'<span class="badge badge-vc">🔒 VC\'s</span>':'')+'</div>'+
         '<div style="font-size:.8rem;color:var(--muted);">'+(p.contact||'')+' · '+(p.email||'')+'</div>'+
-        ((p.activity_description||p.description)?'<div style="font-size:.8rem;color:#555;margin-top:4px;">'+(p.activity_description||p.description)+'</div>':'')+
+        (p.description?'<div style="font-size:.8rem;color:#555;margin-top:4px;">'+p.description+'</div>':'')+
         '<div class="btn-group">'+
         (state.role==='startup'?'<button class="btn btn-primary btn-sm" onclick="openBooking(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\','+!!p.is_vc+')">Prendre RDV →</button>':'')+
-        (state.role==='admin'?
-          '<button class="btn btn-outline btn-sm" onclick="openBooking(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\','+!!p.is_vc+')">Planning</button>'+
+        (state.role==='admin'?'<button class="btn btn-outline btn-sm" onclick="openBooking(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\','+!!p.is_vc+')">Planning</button>'+
           '<button class="btn btn-sm btn-dark" onclick="toggleVC(\''+p.id+'\','+!!p.is_vc+')">'+(p.is_vc?'Retirer VC':'VC\'s')+'</button>'+
-          '<button class="btn btn-sm" style="background:#e0f0ff;color:#1a5fa0;" onclick="uploadLogo(\''+p.id+'\')">🖼</button>'+
           '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="blockSlots(\''+p.id+'\')">🔒</button>'+
-          '<button class="btn btn-sm" style="background:#f0f0f0;color:#333;" onclick="editPartner(decodeURIComponent(\''+pj+'\'))">✏️</button>':'')+'</div></div></div></div>';
-    }).join('')+
-    (partners.length===0?'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun partenaire.</p></div>':'');
+          '<button class="btn btn-sm" style="background:#f0f0f0;" onclick="editPartner(decodeURIComponent(\''+pj+'\'))">✏️</button>':'')+'</div></div></div></div>';
+    }).join('')+(partners.length===0?'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun partenaire.</p></div>':'');
 }
 
 function filterPartners(sector){
@@ -649,36 +550,21 @@ function filterPartners(sector){
 
 function editPartner(pJson){
   var p=typeof pJson==='string'?JSON.parse(pJson):pJson;
-  showModal(
-    '<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
-    '<h2>✏️ Modifier — '+p.name+'</h2>'+
-    '<button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
+  showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>✏️ '+p.name+'</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
     '<div class="form-group"><label>Société</label><input id="eName" value="'+p.name+'"/></div>'+
     '<div class="form-group"><label>Secteur</label><select id="eSector">'+PSECTORS.map(function(s){return '<option'+(s===p.sector?' selected':'')+'>'+s+'</option>';}).join('')+'</select></div>'+
     '<div class="form-group"><label>Contact</label><input id="eContact" value="'+p.contact+'"/></div>'+
     '<div class="form-group"><label>Email</label><input id="eEmail" type="email" value="'+p.email+'"/></div>'+
-    '<div class="form-group"><label>Description</label><textarea id="eDesc" rows="2">'+p.activity_description+'</textarea></div>'+
-    '<div class="form-group"><label>Logo</label><input type="file" id="eLogo" accept="image/*"/>'+
-    (p.logo_url?'<img src="'+p.logo_url+'" style="height:36px;margin-top:4px;border-radius:4px;"/>':'')+'</div>'+
+    '<div class="form-group"><label>Description</label><textarea id="eDesc" rows="2">'+p.description+'</textarea></div>'+
     '<div class="form-group"><label><input type="checkbox" id="eIsVc" style="width:auto;margin-right:6px;"'+(p.is_vc?' checked':'')+'/> Espace VC\'s</label></div>'+
-    '<div class="btn-group">'+
-    '<button class="btn btn-primary" onclick="savePartner(\''+p.id+'\')">💾 Enregistrer</button>'+
-    '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deletePartner(\''+p.id+'\')">🗑 Supprimer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>'
-  );
+    '<div class="btn-group"><button class="btn btn-primary" onclick="savePartner(\''+p.id+'\')">💾 Enregistrer</button>'+
+    '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deletePartner(\''+p.id+'\')">🗑</button>'+
+    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
 
 function savePartner(id){
-  var file=ge('eLogo')&&ge('eLogo').files&&ge('eLogo').files[0];
-  function doSave(logoUrl){
-    var u={name:val('eName'),sector:val('eSector'),contact:val('eContact'),email:val('eEmail'),description:val('eDesc'),is_vc:!!(ge('eIsVc')&&ge('eIsVc').checked)};
-    if(logoUrl){u.logo_url=logoUrl;}
-    sb.from('partners').update(u).eq('id',id).then(function(){closeModal();navigateTo('partners');});
-  }
-  if(file){
-    var path='p_'+id+'_'+Date.now()+'_'+file.name;
-    sb.storage.from('logos').upload(path,file).then(function(r){doSave(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
-  } else {doSave(null);}
+  var u={name:val('eName'),sector:val('eSector'),contact:val('eContact'),email:val('eEmail'),description:val('eDesc'),is_vc:!!(ge('eIsVc')&&ge('eIsVc').checked)};
+  sb.from('partners').update(u).eq('id',id).then(function(){closeModal();navigateTo('partners');});
 }
 
 function deletePartner(id){
@@ -691,31 +577,15 @@ function deletePartner(id){
 }
 
 function addPartner(){
-  var file=ge('pLogo')&&ge('pLogo').files&&ge('pLogo').files[0];
   var isVc=!!(ge('pIsVc')&&ge('pIsVc').checked);
+  var file=ge('pLogo')&&ge('pLogo').files&&ge('pLogo').files[0];
   function ins(logoUrl){
     sb.from('partners').insert({name:val('pName'),sector:val('pSector'),contact:val('pContact'),email:val('pEmail'),description:val('pDesc'),is_vc:isVc,logo_url:logoUrl||null}).select().single().then(function(r){
-      if(r.data){initSlots(r.data.id);}
-      navigateTo('partners');
+      if(r.data){initSlots(r.data.id);}navigateTo('partners');
     });
   }
-  if(file){
-    var path='p_'+Date.now()+'_'+file.name;
-    sb.storage.from('logos').upload(path,file).then(function(r){ins(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
-  } else {ins(null);}
-}
-
-function uploadLogo(id){
-  var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-  inp.onchange=function(){
-    var file=inp.files[0];if(!file)return;
-    var path='p_'+id+'_'+Date.now()+'_'+file.name;
-    sb.storage.from('logos').upload(path,file).then(function(r){
-      if(r.error){alert('Erreur : '+r.error.message);return;}
-      sb.from('partners').update({logo_url:SB_URL+'/storage/v1/object/public/logos/'+path}).eq('id',id).then(function(){navigateTo('partners');});
-    });
-  };
-  inp.click();
+  if(file){var path='p_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');sb.storage.from('logos').upload(path,file).then(function(r){ins(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});}
+  else{ins(null);}
 }
 
 function toggleVC(id,cur){sb.from('partners').update({is_vc:!cur}).eq('id',id).then(function(){navigateTo('partners');});}
@@ -728,14 +598,12 @@ function blockSlots(id){
 function openBooking(partnerId,partnerName,isVC){
   var o=document.createElement('div');o.className='modal-overlay';
   var box=document.createElement('div');box.className='modal-box';
-  box.innerHTML=
-    '<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
+  box.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
     '<div><div style="font-weight:800;font-size:1.05rem;">'+partnerName+'</div>'+
-    (isVC?'<div class="alert alert-warn" style="margin-top:6px;font-size:.78rem;">🔒 Espace VC\'s — validation requise — Pitch deck obligatoire</div>':'')+'</div>'+
+    (isVC?'<div class="alert alert-warn" style="margin-top:6px;font-size:.78rem;">🔒 Espace VC\'s — Pitch deck obligatoire</div>':'')+'</div>'+
     '<button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
-    '<div class="alert alert-info" style="font-size:.78rem;">🟢 Libre &nbsp;⬜ Indispo &nbsp;🔴 Mon RDV &nbsp;⚠️ Conflit conf</div>'+
-    '<div id="slotsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:4px;margin-top:10px;">'+
-    '<div class="loading"><div class="spinner"></div></div></div>';
+    '<div class="alert alert-info" style="font-size:.78rem;">🟢 Libre &nbsp;⬜ Indispo &nbsp;🔴 Mon RDV</div>'+
+    '<div id="slotsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:4px;margin-top:10px;"><div class="loading"><div class="spinner"></div></div></div>';
   o.appendChild(box);document.body.appendChild(o);
   sb.from('slots').select('*').eq('partner_id',partnerId).order('time').then(function(res){
     var slots=res.data||[],myTimes=[],confTimes=[];
@@ -747,12 +615,9 @@ function openBooking(partnerId,partnerName,isVC){
         myTimes=(r[0].data||[]).map(function(s){return s.time;});
         (r[1].data||[]).forEach(function(cr){
           var c=cr.conferences;if(!c)return;
-          var ch=parseInt(c.time.split(':')[0]),cm=parseInt(c.time.split(':')[1]);
-          var start=ch*60+cm,end=start+(c.duration_min||30);
-          TIMES.forEach(function(t){
-            var th=parseInt(t.split(':')[0]),tm=parseInt(t.split(':')[1]),tmin=th*60+tm;
-            if(tmin>=start&&tmin<end){confTimes.push(t);}
-          });
+          var start=parseInt(c.time.split(':')[0])*60+parseInt(c.time.split(':')[1]);
+          var end=start+(c.duration_min||30);
+          TIMES.forEach(function(t){var tmin=parseInt(t.split(':')[0])*60+parseInt(t.split(':')[1]);if(tmin>=start&&tmin<end){confTimes.push(t);}});
         });
         renderSlots(box,slots,myTimes,confTimes,partnerName,isVC);
       });
@@ -769,43 +634,36 @@ function renderSlots(box,slots,myTimes,confTimes,partnerName,isVC){
     else if(confTimes.indexOf(sl.time)>=0){cls='conflict';lbl='⚠️ Conf';clickFn='bookWithWarn(\''+sl.id+'\',\''+sl.time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')';}
     else{cls='free';lbl='Libre';clickFn='openBookForm(\''+sl.id+'\',\''+sl.time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')';}
     var canClick=(cls==='free'||cls==='conflict')&&state.role==='startup';
-    return '<div class="slot '+(canClick?cls==='conflict'?'free':cls:cls)+'" '+(canClick?'onclick="'+clickFn+'"':'')+'>'+
-      '<div style="font-size:.7rem;font-weight:700;">'+sl.time+'</div>'+
-      '<div class="slot-name">'+lbl+'</div></div>';
-  }).join('')||'<p style="color:var(--muted);font-size:.83rem;grid-column:1/-1;padding:10px;">Aucun créneau disponible.</p>';
+    return '<div class="slot '+(canClick?'free':cls)+'" '+(canClick?'onclick="'+clickFn+'"':'')+'>'+
+      '<div style="font-size:.7rem;font-weight:700;">'+sl.time+'</div><div class="slot-name">'+lbl+'</div></div>';
+  }).join('')||'<p style="color:var(--muted);font-size:.83rem;grid-column:1/-1;padding:10px;">Aucun créneau.</p>';
 }
 
 function bookWithWarn(slotId,time,partnerName,isVC){
-  if(!confirm('⚠️ Vous avez une conférence à '+time+'. Prendre quand même ce RDV ?'))return;
+  if(!confirm('⚠️ Conférence à '+time+'. Prendre quand même ?'))return;
   openBookForm(slotId,time,partnerName,isVC);
 }
 
 function openBookForm(slotId,time,partnerName,isVC){
   closeModal();
-  showModal(
-    '<h2>📅 RDV avec '+partnerName+'</h2>'+
-    '<div style="font-size:.83rem;color:var(--muted);margin-bottom:14px;">Créneau : <strong>'+time+'</strong>'+(isVC?' · Espace VC\'s':'')+'</div>'+
-    '<div class="form-group"><label>Commentaire</label>'+
-    '<textarea id="bookComment" rows="3" placeholder="Présentez votre projet..."></textarea></div>'+
-    '<div class="form-group"><label>Pitch deck '+(isVC?'<span style="color:var(--red);">*obligatoire</span>':'<span style="color:var(--muted);font-size:.76rem;">(facultatif)</span>')+'</label>'+
+  showModal('<h2>📅 RDV avec '+partnerName+'</h2>'+
+    '<div style="font-size:.83rem;color:var(--muted);margin-bottom:14px;">Créneau : <strong>'+time+'</strong></div>'+
+    '<div class="form-group"><label>Commentaire</label><textarea id="bookComment" rows="3" placeholder="Présentez votre projet..."></textarea></div>'+
+    '<div class="form-group"><label>Pitch deck '+(isVC?'<span style="color:var(--red);">*obligatoire</span>':'(facultatif)')+'</label>'+
     '<input type="file" id="bookPitch" accept=".pdf,.ppt,.pptx"/></div>'+
-    '<div class="btn-group">'+
-    '<button class="btn btn-primary" onclick="confirmBooking(\''+slotId+'\',\''+time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')">Confirmer →</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>'
-  );
+    '<div class="btn-group"><button class="btn btn-primary" onclick="confirmBooking(\''+slotId+'\',\''+time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')">Confirmer →</button>'+
+    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
 
 function confirmBooking(slotId,time,partnerName,isVC){
   var comment=val('bookComment');
-  var fileInput=ge('bookPitch'),file=fileInput&&fileInput.files&&fileInput.files[0];
-  if(isVC&&!file){alert('Le pitch deck est obligatoire pour l\'Espace VC\'s.');return;}
+  var file=ge('bookPitch')&&ge('bookPitch').files&&ge('bookPitch').files[0];
+  if(isVC&&!file){alert('Le pitch deck est obligatoire.');return;}
   if(file){
-    var path=state.startup.id+'/'+Date.now()+'_'+file.name;
+    var path=state.startup.id+'/'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
     sb.storage.from('pitchdecks').upload(path,file).then(function(r){
       if(r.error){alert('Erreur upload.');return;}
-      sb.storage.from('pitchdecks').createSignedUrl(path,86400*30).then(function(sr){
-        doBooking(slotId,comment,sr.data&&sr.data.signedUrl);
-      });
+      sb.storage.from('pitchdecks').createSignedUrl(path,86400*30).then(function(sr){doBooking(slotId,comment,sr.data&&sr.data.signedUrl);});
     });
   } else {doBooking(slotId,comment,null);}
 }
@@ -815,7 +673,7 @@ function doBooking(slotId,comment,pitchUrl){
   if(pitchUrl){update.pitch_deck_url=pitchUrl;}
   sb.from('slots').update(update).eq('id',slotId).eq('status','free').then(function(r){
     if(r.error){alert('Ce créneau vient d\'être pris.');return;}
-    closeModal();alert('⏳ Demande envoyée ! Le partenaire validera votre RDV.');
+    closeModal();alert('⏳ Demande envoyée !');
   });
 }
 
@@ -827,35 +685,28 @@ function pgMyRdv(el){
     var pending=(res.data||[]).filter(function(s){return s.status==='pending';});
     var booked=(res.data||[]).filter(function(s){return s.status==='booked';});
     el.innerHTML='<h1>Mes RDV — '+p.name+'</h1><div class="subtitle">Validez ou refusez les demandes</div>'+
-      (pending.length?
-        '<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ En attente ('+pending.length+')</h2>'+
-        pending.map(function(s){
-          var su=s.startups||{};
-          var displayName=su.contact&&su.contact.trim()?su.contact:su.email||'-';
-          return '<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
-            '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">'+
-            '<div><div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
-            '<div style="font-size:.8rem;color:var(--muted);">👤 '+displayName+' · 📧 '+(su.email||'-')+' · '+(su.sector||'')+'</div>'+
-            (s.comment?'<div style="font-size:.8rem;margin-top:4px;">💬 '+s.comment+'</div>':'')+
-            (s.pitch_deck_url?'<a href="'+s.pitch_deck_url+'" target="_blank" class="btn btn-sm btn-outline" style="margin-top:4px;display:inline-block;">📄 Pitch deck</a>':'')+'</div>'+
-            '<div class="btn-group">'+
-            '<button class="btn btn-green btn-sm" onclick="partnerValidate(\''+s.id+'\')">✅ Accepter</button>'+
-            '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'partner\')">❌ Refuser</button>'+
-            '</div></div></div>';
-        }).join('')+'</div>':
-        '<div class="card"><p style="color:var(--muted);">Aucune demande en attente.</p></div>')+
-      (booked.length?
-        '<div class="card"><h2>✅ RDV confirmés ('+booked.length+')</h2>'+
-        booked.map(function(s){
-          var su=s.startups||{};
-          var displayName=su.contact&&su.contact.trim()?su.contact:su.email||'-';
-          return '<div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">'+
-            '<div><div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
-            '<div style="font-size:.8rem;color:var(--muted);">👤 '+displayName+' · 📧 '+(su.email||'-')+'</div>'+
-            (s.pitch_deck_url?'<a href="'+s.pitch_deck_url+'" target="_blank" class="btn btn-sm btn-outline" style="margin-top:4px;display:inline-block;">📄</a>':'')+'</div>'+
-            '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'partner\')">Annuler</button>'+
-            '</div>';
-        }).join('')+'</div>':'');
+      (pending.length?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ En attente ('+pending.length+')</h2>'+
+      pending.map(function(s){
+        var su=s.startups||{};
+        var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
+        return '<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
+          '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">'+
+          '<div><div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
+          '<div style="font-size:.8rem;color:var(--muted);">👤 '+dn+' · 📧 '+(su.email||'-')+'</div>'+
+          (s.comment?'<div style="font-size:.8rem;margin-top:4px;">💬 '+s.comment+'</div>':'')+
+          (s.pitch_deck_url?'<a href="'+s.pitch_deck_url+'" target="_blank" class="btn btn-sm btn-outline" style="margin-top:4px;display:inline-block;">📄 Pitch</a>':'')+'</div>'+
+          '<div class="btn-group"><button class="btn btn-green btn-sm" onclick="partnerValidate(\''+s.id+'\')">✅ Accepter</button>'+
+          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'partner\')">❌ Refuser</button></div></div></div>';
+      }).join('')+'</div>':'<div class="card"><p style="color:var(--muted);">Aucune demande en attente.</p></div>')+
+      (booked.length?'<div class="card"><h2>✅ Confirmés ('+booked.length+')</h2>'+
+      booked.map(function(s){
+        var su=s.startups||{};
+        var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
+        return '<div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">'+
+          '<div><div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
+          '<div style="font-size:.8rem;color:var(--muted);">👤 '+dn+' · 📧 '+(su.email||'-')+'</div></div>'+
+          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'partner\')">Annuler</button></div>';
+      }).join('')+'</div>':'');
   });
 }
 
@@ -865,18 +716,17 @@ function partnerValidate(id){sb.from('slots').update({status:'booked'}).eq('id',
 function pgMyRdvStartup(el){
   spinEl(el);
   var s=state.startup;if(!s){el.innerHTML='<p>Profil introuvable.</p>';return;}
-  sb.from('slots').select('*,partners(name,contact,email,sector,description,logo_url,is_vc)').eq('startup_id',s.id).in('status',['pending','booked']).order('time').then(function(res){
+  sb.from('slots').select('*,partners(name,contact,sector,description,logo_url,is_vc)').eq('startup_id',s.id).in('status',['pending','booked']).order('time').then(function(res){
     var slots=res.data||[];
     el.innerHTML='<h1>Mes RDV — '+s.name+'</h1><div class="subtitle">Vos RDV en cours</div>'+
       (slots.length?slots.map(function(sl){
         var p=sl.partners||{};
         var isPending=sl.status==='pending';
         return '<div class="card" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">'+
-          '<div style="display:flex;gap:10px;align-items:flex-start;">'+
+          '<div style="display:flex;gap:10px;">'+
           (p.logo_url?'<img src="'+p.logo_url+'" class="partner-logo"/>':'<div class="partner-logo" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🏢</div>')+
           '<div><div style="font-weight:700;">'+sl.time+' — '+(p.name||'-')+'</div>'+
           '<div style="font-size:.8rem;color:var(--muted);">'+(p.contact||'')+' · '+(p.sector||'')+'</div>'+
-          (p.description?'<div style="font-size:.78rem;color:#555;margin-top:2px;">'+p.description+'</div>':'')+
           '<div style="margin-top:4px;"><span style="font-size:.76rem;padding:2px 8px;border-radius:20px;background:'+(isPending?'#fff3cd':'#d4f5ee')+';color:'+(isPending?'#856404':'var(--green)')+';">'+(isPending?'⏳ En attente':'✅ Confirmé')+'</span></div></div></div>'+
           '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="cancelStartup(\''+sl.id+'\')">Annuler</button></div>';
       }).join(''):'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun RDV.</p></div>');
@@ -884,14 +734,10 @@ function pgMyRdvStartup(el){
 }
 
 function cancelStartup(slotId){
-  showModal(
-    '<h2>Annuler ce RDV</h2>'+
-    '<div class="form-group"><label>Motif <span style="color:var(--red);">*</span></label>'+
-    '<textarea id="cancelComment" rows="3" placeholder="Raison de l\'annulation..."></textarea></div>'+
-    '<div class="btn-group">'+
-    '<button class="btn btn-primary" onclick="doCancel(\''+slotId+'\')">Confirmer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Retour</button></div>'
-  );
+  showModal('<h2>Annuler ce RDV</h2>'+
+    '<div class="form-group"><label>Motif *</label><textarea id="cancelComment" rows="3"></textarea></div>'+
+    '<div class="btn-group"><button class="btn btn-primary" onclick="doCancel(\''+slotId+'\')">Confirmer</button>'+
+    '<button class="btn btn-outline" onclick="closeModal()">Retour</button></div>');
 }
 
 function doCancel(slotId){
@@ -911,33 +757,27 @@ function pgStartups(el){
       return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">'+
         '<div><div style="font-weight:700;">'+s.name+' <span class="badge badge-green">'+(s.sector||'')+'</span></div>'+
         '<div style="font-size:.8rem;color:var(--muted);">'+(s.contact||'')+' · '+(s.email||'')+'</div></div>'+
-        '<button class="btn btn-sm" style="background:#f0f0f0;color:#333;" onclick="editStartup(decodeURIComponent(\''+sj+'\'))">✏️ Modifier</button>'+
-        '</div>';
+        '<button class="btn btn-sm" style="background:#f0f0f0;" onclick="editStartup(decodeURIComponent(\''+sj+'\'))">✏️</button></div>';
     }).join('');
   });
 }
 
 function editStartup(sJson){
   var s=typeof sJson==='string'?JSON.parse(sJson):sJson;
-  showModal(
-    '<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
-    '<h2>✏️ Modifier — '+s.name+'</h2>'+
-    '<button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
+  showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>✏️ '+s.name+'</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
     '<div class="form-group"><label>Société</label><input id="esName" value="'+s.name+'"/></div>'+
     '<div class="form-group"><label>Secteur</label><select id="esSector">'+SSECTORS.map(function(sec){return '<option'+(sec===s.sector?' selected':'')+'>'+sec+'</option>';}).join('')+'</select></div>'+
     '<div class="form-group"><label>Contact</label><input id="esContact" value="'+s.contact+'"/></div>'+
     '<div class="form-group"><label>Email</label><input id="esEmail" type="email" value="'+s.email+'"/></div>'+
-    '<div class="btn-group">'+
-    '<button class="btn btn-primary" onclick="saveStartup(\''+s.id+'\')">💾 Enregistrer</button>'+
-    '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteStartup(\''+s.id+'\')">🗑 Supprimer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>'
-  );
+    '<div class="btn-group"><button class="btn btn-primary" onclick="saveStartup(\''+s.id+'\')">💾 Enregistrer</button>'+
+    '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteStartup(\''+s.id+'\')">🗑</button>'+
+    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
 
 function saveStartup(id){sb.from('startups').update({name:val('esName'),sector:val('esSector'),contact:val('esContact'),email:val('esEmail')}).eq('id',id).then(function(){closeModal();navigateTo('startups');});}
 
 function deleteStartup(id){
-  if(!confirm('Supprimer cette start-up ?'))return;
+  if(!confirm('Supprimer ?'))return;
   sb.from('conf_registrations').delete().eq('startup_id',id).then(function(){
     sb.from('startup_members').delete().eq('startup_id',id).then(function(){
       sb.from('startups').delete().eq('id',id).then(function(){closeModal();navigateTo('startups');});
@@ -958,12 +798,8 @@ function pgConferences(el){
     var myConfIds=(r[1].data||[]).map(function(x){return x.conference_id;});
     var myRdvTimes=(r[2].data||[]).map(function(x){return x.time;});
     var regsByConf={};
-    (r[3].data||[]).forEach(function(x){
-      if(!regsByConf[x.conference_id]){regsByConf[x.conference_id]=[];}
-      if(x.startups){regsByConf[x.conference_id].push(x.startups);}
-    });
-    var form=state.role==='admin'?
-      '<div class="card"><h2>Ajouter une conférence</h2>'+
+    (r[3].data||[]).forEach(function(x){if(!regsByConf[x.conference_id]){regsByConf[x.conference_id]=[];}if(x.startups){regsByConf[x.conference_id].push(x.startups);}});
+    var form=state.role==='admin'?'<div class="card"><h2>Ajouter une conférence</h2>'+
       '<div class="grid2"><div class="form-group"><label>Titre</label><input id="cTitle"/></div>'+
       '<div class="form-group"><label>Heure</label><input id="cTime" placeholder="14:00"/></div>'+
       '<div class="form-group"><label>Durée (min)</label><input id="cDur" type="number" value="30"/></div>'+
@@ -976,38 +812,24 @@ function pgConferences(el){
       var isReg=myConfIds.indexOf(c.id)>=0;
       var conflict=false;
       if(myRdvTimes.length){
-        var ch=parseInt(c.time.split(':')[0]),cm=parseInt(c.time.split(':')[1]);
-        var cstart=ch*60+cm,cend=cstart+(c.duration_min||30);
-        myRdvTimes.forEach(function(t){
-          var th=parseInt(t.split(':')[0]),tm=parseInt(t.split(':')[1]),tmin=th*60+tm;
-          if(tmin>=cstart&&tmin<cend){conflict=true;}
-        });
+        var cstart=parseInt(c.time.split(':')[0])*60+parseInt(c.time.split(':')[1]);
+        var cend=cstart+(c.duration_min||30);
+        myRdvTimes.forEach(function(t){var tmin=parseInt(t.split(':')[0])*60+parseInt(t.split(':')[1]);if(tmin>=cstart&&tmin<cend){conflict=true;}});
       }
       var cj=encodeURIComponent(JSON.stringify({id:c.id,title:c.title,time:c.time,duration_min:c.duration_min,salle:c.salle||'',speaker:c.speaker||'',description:c.description||''}));
       var regs=regsByConf[c.id]||[];
-      var regsHtml='';
-      if(state.role==='admin'&&regs.length){
-        regsHtml='<div style="margin-top:8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:.78rem;">'+
-          '<div style="font-weight:600;margin-bottom:4px;">👥 Inscrits ('+regs.length+') :</div>'+
-          regs.map(function(s){return '<div>'+s.contact+' — '+s.name+'</div>';}).join('')+'</div>';
-      }
-      var btns='';
-      if(state.role==='admin'){
-        btns='<button class="btn btn-sm" style="background:#f0f0f0;color:#333;" onclick="editConf(decodeURIComponent(\''+cj+'\'))">✏️</button> '+
-          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteConf(\''+c.id+'\')">🗑</button>';
-      } else if(isReg){
-        btns='<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="unregConf(\''+c.id+'\')">Se désinscrire</button><span class="badge badge-green">✓ Inscrit(e)</span>';
-      } else {
-        btns='<button class="btn btn-primary btn-sm" onclick="regConf(\''+c.id+'\','+conflict+')">S\'inscrire</button>';
-      }
+      var regsHtml=state.role==='admin'&&regs.length?'<div style="margin-top:8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:.78rem;"><div style="font-weight:600;margin-bottom:4px;">👥 Inscrits ('+regs.length+') :</div>'+regs.map(function(s){return '<div>'+s.contact+' — '+s.name+'</div>';}).join('')+'</div>':'';
+      var btns=state.role==='admin'?
+        '<button class="btn btn-sm" style="background:#f0f0f0;" onclick="editConf(decodeURIComponent(\''+cj+'\'))">✏️</button> <button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteConf(\''+c.id+'\')">🗑</button>':
+        isReg?'<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="unregConf(\''+c.id+'\')">Se désinscrire</button><span class="badge badge-green">✓ Inscrit(e)</span>':
+        '<button class="btn btn-primary btn-sm" onclick="regConf(\''+c.id+'\','+conflict+')">S\'inscrire</button>';
       return '<div class="conf-card">'+
         '<div style="font-size:.76rem;color:var(--muted);">🕐 '+c.time+' · '+c.duration_min+' min · '+(c.salle||'')+'</div>'+
         '<div style="font-weight:700;margin:3px 0;">'+c.title+'</div>'+
         '<div style="font-size:.8rem;">🎤 '+(c.speaker||'')+'</div>'+
         (c.description?'<div style="font-size:.78rem;color:#666;margin-top:3px;">'+c.description+'</div>':'')+
-        (conflict&&!isReg?'<div class="alert alert-warn" style="font-size:.76rem;margin-top:6px;">⚠️ Vous avez un RDV à ce créneau</div>':'')+
-        regsHtml+
-        '<div class="btn-group" style="margin-top:8px;">'+btns+'</div></div>';
+        (conflict&&!isReg?'<div class="alert alert-warn" style="font-size:.76rem;margin-top:6px;">⚠️ RDV à ce créneau</div>':'')+
+        regsHtml+'<div class="btn-group" style="margin-top:8px;">'+btns+'</div></div>';
     }).join('');
   });
 }
@@ -1016,33 +838,26 @@ function addConf(){sb.from('conferences').insert({title:val('cTitle'),time:val('
 
 function editConf(cJson){
   var c=typeof cJson==='string'?JSON.parse(cJson):cJson;
-  showModal(
-    '<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
-    '<h2>✏️ Modifier la conférence</h2>'+
-    '<button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
+  showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>✏️ Conférence</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
     '<div class="form-group"><label>Titre</label><input id="ecTitle" value="'+c.title+'"/></div>'+
     '<div class="grid2"><div class="form-group"><label>Heure</label><input id="ecTime" value="'+c.time+'"/></div>'+
     '<div class="form-group"><label>Durée (min)</label><input id="ecDur" type="number" value="'+c.duration_min+'"/></div></div>'+
     '<div class="form-group"><label>Salle</label><input id="ecSalle" value="'+c.salle+'"/></div>'+
     '<div class="form-group"><label>Intervenant(s)</label><input id="ecSpeaker" value="'+c.speaker+'"/></div>'+
     '<div class="form-group"><label>Description</label><textarea id="ecDesc" rows="2">'+c.description+'</textarea></div>'+
-    '<div class="btn-group">'+
-    '<button class="btn btn-primary" onclick="saveConf(\''+c.id+'\')">💾 Enregistrer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>'
-  );
+    '<div class="btn-group"><button class="btn btn-primary" onclick="saveConf(\''+c.id+'\')">💾 Enregistrer</button>'+
+    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
 
 function saveConf(id){sb.from('conferences').update({title:val('ecTitle'),time:val('ecTime'),duration_min:parseInt(val('ecDur'))||30,salle:val('ecSalle'),speaker:val('ecSpeaker'),description:val('ecDesc')}).eq('id',id).then(function(){closeModal();navigateTo('conferences');});}
 
 function deleteConf(id){
-  if(!confirm('Supprimer cette conférence ?'))return;
-  sb.from('conf_registrations').delete().eq('conference_id',id).then(function(){
-    sb.from('conferences').delete().eq('id',id).then(function(){navigateTo('conferences');});
-  });
+  if(!confirm('Supprimer ?'))return;
+  sb.from('conf_registrations').delete().eq('conference_id',id).then(function(){sb.from('conferences').delete().eq('id',id).then(function(){navigateTo('conferences');});});
 }
 
 function regConf(cid,hasConflict){
-  if(hasConflict&&!confirm('⚠️ Vous avez un RDV à ce créneau. S\'inscrire quand même ?'))return;
+  if(hasConflict&&!confirm('⚠️ RDV à ce créneau. S\'inscrire quand même ?'))return;
   if(!state.startup){alert('Connectez-vous en tant que start-up.');return;}
   sb.from('conf_registrations').insert({conference_id:cid,startup_id:state.startup.id}).then(function(){navigateTo('conferences');});
 }
@@ -1057,27 +872,21 @@ function pgCrashTest(el){
   spinEl(el);
   sb.from('crash_test_corners').select('*').order('name').then(function(rc){
     var corners=rc.data||[];
-    var form=state.role==='admin'?
-      '<div class="card"><h2>Créer un corner</h2>'+
-      '<div class="form-group"><label>Nom du corner</label><input id="ctName" placeholder="Salle 1 — Challenge ton BP"/></div>'+
+    var form=state.role==='admin'?'<div class="card"><h2>Créer un corner</h2>'+
+      '<div class="form-group"><label>Nom</label><input id="ctName" placeholder="Salle 1"/></div>'+
       '<div class="form-group"><label>Description</label><textarea id="ctDesc" rows="2"></textarea></div>'+
-      '<div class="form-group"><label>Créneaux (HH:MM séparés par virgules)</label><input id="ctSlots" placeholder="14:00,14:30,15:00"/></div>'+
-      '<button class="btn btn-primary" onclick="addCorner()">Créer le corner</button></div>':'';
-    el.innerHTML='<h1>🔬 Crash Test</h1><div class="subtitle">Inscrivez-vous sur un créneau de présentation</div>'+form+
+      '<div class="form-group"><label>Créneaux (HH:MM séparés par virgules)</label><input id="ctSlots" placeholder="14:00,14:30"/></div>'+
+      '<button class="btn btn-primary" onclick="addCorner()">Créer</button></div>':'';
+    el.innerHTML='<h1>🔬 Crash Test</h1><div class="subtitle">Inscrivez-vous sur un créneau</div>'+form+
       (corners.length?corners.map(function(corner){
         var cj=encodeURIComponent(JSON.stringify({id:corner.id,name:corner.name,description:corner.description||''}));
-        return '<div class="card">'+
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'+
+        return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'+
           '<h2 style="margin:0;">'+corner.name+'</h2>'+
-          (state.role==='admin'?
-            '<div class="btn-group" style="margin:0;">'+
-            '<button class="btn btn-sm" style="background:#f0f0f0;color:#333;" onclick="editCorner(decodeURIComponent(\''+cj+'\'))">✏️</button>'+
-            '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteCorner(\''+corner.id+'\')">🗑</button>'+
-            '</div>':'')+
-          '</div>'+
-          (corner.description?'<p style="font-size:.82rem;color:#555;margin-bottom:12px;">'+corner.description+'</p>':'')+
+          (state.role==='admin'?'<div class="btn-group" style="margin:0;"><button class="btn btn-sm" style="background:#f0f0f0;" onclick="editCorner(decodeURIComponent(\''+cj+'\'))">✏️</button>'+
+          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteCorner(\''+corner.id+'\')">🗑</button></div>':'')+
+          '</div>'+(corner.description?'<p style="font-size:.82rem;color:#555;margin-bottom:12px;">'+corner.description+'</p>':'')+
           '<div id="ctslots_'+corner.id+'"><div class="loading"><div class="spinner"></div></div></div></div>';
-      }).join(''):'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun corner disponible.</p></div>');
+      }).join(''):'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun corner.</p></div>');
     corners.forEach(function(corner){loadCornerSlots(corner.id);});
   });
 }
@@ -1087,82 +896,59 @@ function loadCornerSlots(cornerId){
   sb.from('crash_test_slots').select('*,startups(name,contact)').eq('corner_id',cornerId).order('time').then(function(res){
     var slots=res.data||[];
     var booked=slots.filter(function(s){return s.status==='booked'&&s.startups;});
-    var slotsHtml='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;">'+
+    el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;">'+
       slots.map(function(sl){
         var isMine=state.startup&&sl.startup_id===state.startup.id;
         var isBooked=sl.status==='booked';
         var cls=isMine?'mine':isBooked?'unavailable':'free';
-        var lbl=isMine?'Mon créneau':isBooked?'Réservé':'Libre';
         var canClick=!isBooked&&state.role==='startup'&&!isMine;
         return '<div class="slot '+cls+'" '+(canClick?'onclick="bookCrashTest(\''+sl.id+'\',\''+sl.time+'\')"':'')+'>'+
           '<div style="font-size:.72rem;font-weight:700;">'+sl.time+'</div>'+
-          '<div class="slot-name">'+lbl+'</div>'+
-          (isBooked&&state.role==='admin'&&sl.startups?'<div style="font-size:.6rem;margin-top:2px;color:#555;">'+sl.startups.contact+'</div>':'')+'</div>';
-      }).join('')+'</div>';
-    var inscHtml='';
-    if(state.role==='admin'&&booked.length){
-      inscHtml='<div style="margin-top:12px;padding:10px;background:#f9f9f9;border-radius:8px;font-size:.78rem;">'+
-        '<div style="font-weight:600;margin-bottom:6px;">👥 Inscrits ('+booked.length+') :</div>'+
-        booked.map(function(s){return '<div>'+s.startups.contact+' — '+s.startups.name+' · '+s.time+'</div>';}).join('')+'</div>';
-    }
-    el.innerHTML=slots.length?(slotsHtml+inscHtml):'<p style="color:var(--muted);font-size:.82rem;">Aucun créneau configuré.</p>';
+          '<div class="slot-name">'+(isMine?'Mon créneau':isBooked?'Réservé':'Libre')+'</div></div>';
+      }).join('')+'</div>'+
+      (state.role==='admin'&&booked.length?'<div style="margin-top:12px;padding:10px;background:#f9f9f9;border-radius:8px;font-size:.78rem;"><div style="font-weight:600;margin-bottom:6px;">👥 Inscrits :</div>'+booked.map(function(s){return '<div>'+s.startups.contact+' — '+s.startups.name+' · '+s.time+'</div>';}).join('')+'</div>':'');
   });
 }
 
 function addCorner(){
   var name=val('ctName'),desc=val('ctDesc'),slotsStr=val('ctSlots');
-  if(!name){alert('Donnez un nom au corner.');return;}
+  if(!name){alert('Donnez un nom.');return;}
   sb.from('crash_test_corners').insert({name:name,description:desc}).select().single().then(function(r){
-    if(r.error||!r.data){alert('Erreur : '+(r.error?r.error.message:'inconnue'));return;}
-    var cornerId=r.data.id;
+    if(r.error||!r.data){alert('Erreur.');return;}
     var times=slotsStr.split(',').map(function(t){return t.trim();}).filter(Boolean);
-    if(times.length){
-      var rows=times.map(function(t){return {corner_id:cornerId,time:t,status:'free'};});
-      sb.from('crash_test_slots').insert(rows).then(function(){navigateTo('crashtest');});
-    } else {navigateTo('crashtest');}
+    if(times.length){sb.from('crash_test_slots').insert(times.map(function(t){return {corner_id:r.data.id,time:t,status:'free'};})).then(function(){navigateTo('crashtest');});}
+    else{navigateTo('crashtest');}
   });
 }
 
 function editCorner(cJson){
   var c=typeof cJson==='string'?JSON.parse(cJson):cJson;
-  showModal(
-    '<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
-    '<h2>✏️ Modifier le corner</h2>'+
-    '<button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
+  showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>✏️ Corner</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
     '<div class="form-group"><label>Nom</label><input id="ecName" value="'+c.name+'"/></div>'+
     '<div class="form-group"><label>Description</label><textarea id="ecDesc2" rows="2">'+c.description+'</textarea></div>'+
-    '<div class="form-group"><label>Ajouter des créneaux (HH:MM séparés par virgules)</label><input id="ecSlots" placeholder="16:00,16:30"/></div>'+
-    '<div class="btn-group">'+
-    '<button class="btn btn-primary" onclick="saveCorner(\''+c.id+'\')">💾 Enregistrer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>'
-  );
+    '<div class="form-group"><label>Ajouter créneaux</label><input id="ecSlots" placeholder="16:00,16:30"/></div>'+
+    '<div class="btn-group"><button class="btn btn-primary" onclick="saveCorner(\''+c.id+'\')">💾 Enregistrer</button>'+
+    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
 
 function saveCorner(id){
-  var name=val('ecName'),desc=val('ecDesc2'),slotsStr=val('ecSlots');
-  if(!name){alert('Le nom est obligatoire.');return;}
-  sb.from('crash_test_corners').update({name:name,description:desc}).eq('id',id).then(function(){
-    if(slotsStr){
-      var times=slotsStr.split(',').map(function(t){return t.trim();}).filter(Boolean);
-      var rows=times.map(function(t){return {corner_id:id,time:t,status:'free'};});
-      sb.from('crash_test_slots').insert(rows).then(function(){closeModal();navigateTo('crashtest');});
-    } else {closeModal();navigateTo('crashtest');}
+  var slotsStr=val('ecSlots');
+  sb.from('crash_test_corners').update({name:val('ecName'),description:val('ecDesc2')}).eq('id',id).then(function(){
+    if(slotsStr){var rows=slotsStr.split(',').map(function(t){return {corner_id:id,time:t.trim(),status:'free'};}).filter(function(r){return r.time;});sb.from('crash_test_slots').insert(rows).then(function(){closeModal();navigateTo('crashtest');});}
+    else{closeModal();navigateTo('crashtest');}
   });
 }
 
 function deleteCorner(id){
   if(!confirm('Supprimer ce corner ?'))return;
-  sb.from('crash_test_slots').delete().eq('corner_id',id).then(function(){
-    sb.from('crash_test_corners').delete().eq('id',id).then(function(){navigateTo('crashtest');});
-  });
+  sb.from('crash_test_slots').delete().eq('corner_id',id).then(function(){sb.from('crash_test_corners').delete().eq('id',id).then(function(){navigateTo('crashtest');});});
 }
 
 function bookCrashTest(slotId,time){
-  if(!state.startup){alert('Connectez-vous en tant que start-up.');return;}
-  if(!confirm('Réserver le créneau Crash Test à '+time+' ?'))return;
+  if(!confirm('Réserver à '+time+' ?'))return;
   sb.from('crash_test_slots').update({status:'booked',startup_id:state.startup.id}).eq('id',slotId).eq('status','free').then(function(r){
     if(r.error){alert('Créneau déjà pris.');return;}
-    alert('✅ Créneau Crash Test réservé à '+time+' !');navigateTo('crashtest');
+    alert('✅ Réservé à '+time+' !');navigateTo('crashtest');
   });
 }
 
@@ -1174,8 +960,7 @@ function pgPlanning(el){
       var map={};
       (r2.data||[]).forEach(function(s){if(!map[s.partner_id]){map[s.partner_id]={};}map[s.partner_id][s.time]=s.status;});
       var partners=r1.data||[];
-      var sectors=['Tous'].concat(PSECTORS);
-      var filterBar='<div class="filter-bar" id="pfBar">'+sectors.map(function(s){
+      var filterBar='<div class="filter-bar" id="pfBar">'+['Tous'].concat(PSECTORS).map(function(s){
         return '<button class="filter-btn'+(s==='Tous'?' active':'')+'" onclick="filterPlanning(\''+s+'\')">'+s+'</button>';
       }).join('')+'</div>';
       el.innerHTML='<h1>Planning global</h1>'+filterBar+'<div id="pfTable">'+buildPlanTable(partners,map)+'</div>';
@@ -1186,7 +971,7 @@ function pgPlanning(el){
 
 function buildPlanTable(list,map){
   return '<div style="overflow-x:auto;"><table><tr><th>Heure</th>'+list.map(function(p){return '<th>'+p.name+(p.is_vc?' 🔒':'')+'</th>';}).join('')+'</tr>'+
-    TIMES.map(function(t){return '<tr><td style="font-weight:700;color:var(--red);white-space:nowrap;">'+t+'</td>'+
+    TIMES.map(function(t){return '<tr><td style="font-weight:700;color:var(--red);">'+t+'</td>'+
       list.map(function(p){var st=map[p.id]&&map[p.id][t];
         if(!st){return '<td>—</td>';}
         if(st==='booked'||st==='pending'){return '<td style="color:var(--red);">✖</td>';}
@@ -1198,8 +983,7 @@ function buildPlanTable(list,map){
 function filterPlanning(sector){
   var el=document.querySelector('[data-page="planning"]');if(!el)return;
   document.querySelectorAll('#pfBar .filter-btn').forEach(function(b){b.classList.toggle('active',b.textContent===sector);});
-  var list=sector==='Tous'?el._p:(el._p||[]).filter(function(p){return p.sector===sector;});
-  var t=ge('pfTable');if(t){t.innerHTML=buildPlanTable(list,el._m||{});}
+  var t=ge('pfTable');if(t){t.innerHTML=buildPlanTable(sector==='Tous'?el._p:(el._p||[]).filter(function(p){return p.sector===sector;}),el._m||{});}
 }
 
 // === MY PLANNING ===
@@ -1208,15 +992,14 @@ function pgMyPlanning(el){
   var p=state.partner;if(!p){el.innerHTML='<p>Profil introuvable.</p>';return;}
   sb.from('slots').select('*').eq('partner_id',p.id).order('time').then(function(res){
     el.innerHTML='<h1>Mon planning — '+p.name+'</h1>'+
-      '<div class="alert alert-info">Cliquez sur un créneau pour basculer disponible / indisponible.</div>'+
+      '<div class="alert alert-info">Cliquez pour basculer disponible / indisponible.</div>'+
       '<div class="card"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:4px;">'+
       (res.data||[]).map(function(sl){
         var cls=sl.status==='free'?'free':sl.status==='booked'?'booked':sl.status==='pending'?'pending':'unavailable';
         var lbl=sl.status==='free'?'Dispo':sl.status==='booked'?'Réservé':sl.status==='pending'?'En attente':'Indispo';
         var toggle=sl.status==='free'||sl.status==='unavailable';
         return '<div class="slot '+cls+'" '+(toggle?'onclick="toggleSlot(\''+sl.id+'\',\''+sl.status+'\',this)"':'')+'>'+
-          '<div style="font-size:.7rem;font-weight:700;">'+sl.time+'</div>'+
-          '<div class="slot-name">'+lbl+'</div></div>';
+          '<div style="font-size:.7rem;font-weight:700;">'+sl.time+'</div><div class="slot-name">'+lbl+'</div></div>';
       }).join('')+'</div></div>';
   });
 }
@@ -1224,8 +1007,7 @@ function pgMyPlanning(el){
 function toggleSlot(id,cur,el){
   var ns=cur==='free'?'unavailable':'free';
   sb.from('slots').update({status:ns}).eq('id',id).then(function(){
-    el.className='slot '+ns;
-    el.querySelector('.slot-name').textContent=ns==='free'?'Dispo':'Indispo';
+    el.className='slot '+ns;el.querySelector('.slot-name').textContent=ns==='free'?'Dispo':'Indispo';
     el.onclick=function(){toggleSlot(id,ns,el);};
   });
 }
@@ -1245,7 +1027,7 @@ function pgMyAgenda(el){
     (r[2].data||[]).forEach(function(x){events.push({time:x.time,type:'crash',label:(x.crash_test_corners&&x.crash_test_corners.name)||'Crash Test',sub:'🔬 Crash Test'});});
     events.sort(function(a,b){return a.time.localeCompare(b.time);});
     el.innerHTML='<h1>Mon agenda — '+s.name+'</h1>'+
-      (!events.length?'<div class="card"><p style="color:var(--muted);text-align:center;padding:24px;">Aucun événement planifié.</p></div>':
+      (!events.length?'<div class="card"><p style="color:var(--muted);text-align:center;padding:24px;">Aucun événement.</p></div>':
       '<div class="card">'+events.map(function(e){
         var bg=e.type==='rdv'?'#ffe0e6':e.type==='conf'?'#d4f5ee':'#e0f0ff';
         var color=e.type==='rdv'?'var(--red)':e.type==='conf'?'var(--green)':'#1a5fa0';
@@ -1264,18 +1046,16 @@ function pgMyPDF(el){
 }
 
 function generatePDF(){
-  var jsPDF=window.jspdf.jsPDF;
-  var doc=new jsPDF({unit:'mm',format:'a4'});
-  var isP=state.role==='partner',user=isP?state.partner:state.startup;
+  var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+  var user=state.role==='partner'?state.partner:state.startup;
   if(!user){alert('Profil introuvable');return;}
-  var W=210,m=15;
+  var W=210,m=15,y=45;
   doc.setFillColor(26,26,46);doc.rect(0,0,W,35,'F');
   doc.setFillColor(255,0,50);doc.rect(0,30,W,5,'F');
   doc.setTextColor(255,255,255);
   doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text('FRENCH TECH PARIS-SACLAY',m,14);
   doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('B2B Matchmaking 2026',m,22);
   doc.setFontSize(9);doc.text('Généré le '+new Date().toLocaleDateString('fr-FR'),W-m,22,{align:'right'});
-  var y=45;
   doc.setFillColor(244,244,247);doc.roundedRect(m,y,W-2*m,18,3,3,'F');
   doc.setTextColor(26,26,46);doc.setFontSize(12);doc.setFont('helvetica','bold');doc.text(user.name,m+6,y+8);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
@@ -1283,14 +1063,10 @@ function generatePDF(){
   function sec(t,r,g,b){doc.setFillColor(r,g,b);doc.rect(m,y,W-2*m,8,'F');doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text(t,m+4,y+5.5);y+=12;}
   function row(l,rv,alt){if(alt){doc.setFillColor(249,249,252);doc.rect(m,y-1,W-2*m,7,'F');}doc.setTextColor(26,26,46);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(l,m+4,y+4);doc.setFont('helvetica','normal');doc.text(rv,m+28,y+4,{maxWidth:W-m-32});y+=8;if(y>270){doc.addPage();y=20;}}
   function footer(){doc.setFillColor(26,26,46);doc.rect(0,285,W,12,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.text('La French Tech Paris-Saclay · B2B Matchmaking 2026',m,292);doc.save('programme_'+user.name.replace(/\s+/g,'_')+'.pdf');}
-  if(isP){
+  if(state.role==='partner'){
     sb.from('slots').select('time,startups(name,contact,email)').eq('partner_id',user.id).eq('status','booked').order('time').then(function(res){
       sec('📅 RDV Confirmés ('+(res.data||[]).length+')',26,26,46);
-      (res.data||[]).forEach(function(s,i){
-        var su=s.startups||{};
-        var label=su.contact&&su.contact.trim()?su.name+' — '+su.contact:su.name+' — '+(su.email||'');
-        row(s.time,label,i%2===0);
-      });
+      (res.data||[]).forEach(function(s,i){var su=s.startups||{};row(s.time,(su.contact||su.email||'-')+' — '+(su.name||'-'),i%2===0);});
       footer();
     });
   } else {
@@ -1308,60 +1084,6 @@ function generatePDF(){
 }
 
 window.addEventListener('load',function(){checkSession();});
-
-// Rendre toutes les fonctions globales explicitement
-window.saveAccount=saveAccount;
-window.doEntityUpdate=doEntityUpdate;
-window.navigateTo=navigateTo;
-window.logout=logout;
-window.switchTab=switchTab;
-window.showLogin=showLogin;
-window.showForgot=showForgot;
-window.showRegister=showRegister;
-window.showRegFields=showRegFields;
-window.doLogin=doLogin;
-window.doRegister=doRegister;
-window.togglePw=togglePw;
-window.toggleNewSoc=toggleNewSoc;
-window.sendReset=sendReset;
-window.closeModal=closeModal;
-window.openBooking=openBooking;
-window.openBookForm=openBookForm;
-window.confirmBooking=confirmBooking;
-window.bookWithWarn=bookWithWarn;
-window.partnerValidate=partnerValidate;
-window.adminValidate=adminValidate;
-window.openRefuse=openRefuse;
-window.confirmRefuse=confirmRefuse;
-window.cancelStartup=cancelStartup;
-window.doCancel=doCancel;
-window.filterPartners=filterPartners;
-window.editPartner=editPartner;
-window.savePartner=savePartner;
-window.deletePartner=deletePartner;
-window.addPartner=addPartner;
-window.uploadLogo=uploadLogo;
-window.toggleVC=toggleVC;
-window.blockSlots=blockSlots;
-window.editStartup=editStartup;
-window.saveStartup=saveStartup;
-window.deleteStartup=deleteStartup;
-window.addConf=addConf;
-window.editConf=editConf;
-window.saveConf=saveConf;
-window.deleteConf=deleteConf;
-window.regConf=regConf;
-window.unregConf=unregConf;
-window.addCorner=addCorner;
-window.editCorner=editCorner;
-window.saveCorner=saveCorner;
-window.deleteCorner=deleteCorner;
-window.bookCrashTest=bookCrashTest;
-window.filterPlanning=filterPlanning;
-window.toggleSlot=toggleSlot;
-window.generatePDF=generatePDF;
-window.val=val;
-window.ge=ge;
 </script>
 </body>
 </html>
