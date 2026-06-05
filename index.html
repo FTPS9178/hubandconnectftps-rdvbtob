@@ -439,12 +439,23 @@ function renderNav(){
     partner:[{id:'myPlanning',label:'📅 Planning'},{id:'myRdv',label:'📋 Mes RDV'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'myPDF',label:'📄 PDF'},{id:'myAccount',label:'👤 Mon compte'}],
     startup:[{id:'partners',label:'🏢 RDV'},{id:'myRdvStartup',label:'📋 Mes RDV'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'myAgenda',label:'📅 Agenda'},{id:'myPDF',label:'📄 PDF'},{id:'myAccount',label:'👤 Mon compte'}]
   };
+
+  // Créer navLinksMobile s'il n'existe pas
+  if(!ge('navLinksMobile')){
+    var mobileNav=document.createElement('div');
+    mobileNav.id='navLinksMobile';
+    mobileNav.style.cssText='display:none;background:var(--dark);position:fixed;top:56px;left:0;right:0;z-index:39;padding:8px;box-shadow:0 4px 16px rgba(0,0,0,.5);';
+    var app=ge('app');
+    if(app)app.insertBefore(mobileNav,ge('pageContainer'));
+  }
+
   var btns=(links[state.role]||[]).map(function(l){
     return '<button onclick="navigateTo(\''+l.id+'\')" id="nav_'+l.id+'" style="background:none;border:none;color:#ccc;cursor:pointer;padding:6px 9px;border-radius:6px;font-size:.76rem;white-space:nowrap;">'+l.label+'</button>';
   }).join('');
   var mbtns=(links[state.role]||[]).map(function(l){
     return '<button onclick="navigateTo(\''+l.id+'\')" id="mav_'+l.id+'" style="display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;padding:11px 14px;border-radius:6px;font-size:.9rem;text-align:left;">'+l.label+'</button>';
   }).join('');
+
   var desktop=ge('navLinks');
   var mobile=ge('navLinksMobile');
   if(desktop)desktop.innerHTML=btns;
