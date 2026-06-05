@@ -434,9 +434,9 @@ function pgMyAccount(el){
       '<h2>🔐 Mot de passe</h2>'+
       '<div class="grid2">'+
       '<div class="form-group"><label>Nouveau mot de passe <span style="color:var(--muted);font-size:.76rem;">(laisser vide = pas de changement)</span></label>'+
-      '<div class="pw-wrap"><input id="acPass" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'acPass\',this)" type="button">👁</button></div></div>'+
+      '<div class="pw-wrap"><input id="acPass" type="password" placeholder="••••••••" autocomplete="new-password"/><button class="pw-eye" onclick="togglePw(\'acPass\',this)" type="button">👁</button></div></div>'+
       '<div class="form-group"><label>Confirmer</label>'+
-      '<div class="pw-wrap"><input id="acPass2" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'acPass2\',this)" type="button">👁</button></div></div></div>'+
+      '<div class="pw-wrap"><input id="acPass2" type="password" placeholder="••••••••" autocomplete="new-password"/><button class="pw-eye" onclick="togglePw(\'acPass2\',this)" type="button">👁</button></div></div></div>'+
       '<button class="btn btn-primary" id="btnSave">💾 Enregistrer</button>'+
       '<hr style="margin:20px 0;border-color:var(--border);">'+
       '<h2>🔒 RGPD</h2>'+
@@ -451,10 +451,14 @@ function pgMyAccount(el){
 function saveAccount(){
   var contact=val('acContact').trim();
   var societe=val('acSociete'),sector=val('acSector'),desc=val('acDesc');
-  var pass=val('acPass'),pass2=val('acPass2');
+  var passEl=ge('acPass'),pass2El=ge('acPass2');
+  var pass=passEl?passEl.value:'',pass2=pass2El?pass2El.value:'';
   if(!contact){alert('Le contact est obligatoire.');return;}
-  if(pass&&pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
-  if(pass){sb.auth.updateUser({password:pass});}
+  if(pass&&pass.length>0){
+    if(pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
+    if(pass.length<6){alert('Mot de passe trop court (6 caractères minimum).');return;}
+    sb.auth.updateUser({password:pass});
+  }
   var linkedin=val('acLinkedin'),website=val('acWebsite');
   var eu={name:societe,contact:contact,sector:sector,description:desc,activity_description:desc};
   if(linkedin)eu.linkedin_url=linkedin;
