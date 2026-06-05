@@ -581,19 +581,43 @@ function saveAccount(){
   var eu={name:societe,contact:contact,sector:sector,description:desc,activity_description:desc};
   if(linkedin)eu.linkedin_url=linkedin;
   if(website)eu.website_url=website;
+
   var tbl=state.role==='partner'?'partners':'startups';
   var entity=state.role==='partner'?state.partner:state.startup;
+
   sb.from('profiles').update({contact:contact,name:societe,sector:sector}).eq('id',state.user.id);
-  if(entity&&entity.id){
-    sb.from(tbl).update(eu).eq('id',entity.id).then(function(r){
-      if(r.error){alert('❌ Erreur : '+r.error.message);return;}
-      if(state.role==='partner'){state.partner=Object.assign({},state.partner,eu);}
-      else{state.startup=Object.assign({},state.startup,eu);}
-      state.profile=Object.assign({},state.profile,{contact:contact,name:societe,sector:sector});
-      ge('userLabel').textContent=societe||state.user.email;
-      alert('✅ Compte mis à jour !');
+
+  function doUpdate(logoUrl){
+    if(logoUrl)eu.logo_url=logoUrl;
+    if(entity&&entity.id){
+      sb.from(tbl).update(eu).eq('id',entity.id).then(function(r){
+        if(r.error){alert('❌ Erreur : '+r.error.message);return;}
+        if(state.role==='partner'){state.partner=Object.assign({},state.partner,eu);}
+        else{state.startup=Object.assign({},state.startup,eu);}
+        state.profile=Object.assign({},state.profile,{contact:contact,name:societe,sector:sector});
+        ge('userLabel').textContent=societe||state.user.email;
+        alert('✅ Compte mis à jour !');
+      });
+    } else {alert('❌ Entité introuvable.');}
+  }
+
+  // Upload logo si fichier sélectionné
+  var fileInput=ge('acLogo');
+  var file=fileInput&&fileInput.files&&fileInput.files.length>0?fileInput.files[0]:null;
+  if(file){
+    var cleanName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    var path='logo_'+Date.now()+'_'+cleanName;
+    sb.storage.from('logos').upload(path,file,{upsert:true}).then(function(r){
+      if(r.error){
+        console.error('Logo upload error:',r.error.message);
+        doUpdate(null);
+      } else {
+        doUpdate(SB_URL+'/storage/v1/object/public/logos/'+path);
+      }
     });
-  } else {alert('❌ Entité introuvable.');}
+  } else {
+    doUpdate(null);
+  }
 }
 
 function showRgpd(){
