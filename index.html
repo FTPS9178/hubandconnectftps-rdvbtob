@@ -188,7 +188,11 @@ function showRegFields(role,el){
   var sectors=role==='partner'?PSECTORS:SSECTORS;
   sb.from(role==='partner'?'partners':'startups').select('id,name').order('name').then(function(res){
     var existing=res.data||[];
+    var inviteField=role==='partner'?
+      '<div class="form-group"><label>Code d\'invitation <span style="color:var(--red);">*</span></label>'+
+      '<input id="rInviteCode" placeholder="Entrez votre code d\'invitation"/></div>':'';
     ge('regFields').innerHTML=
+      inviteField+
       '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label><input id="rContact" placeholder="Ex: Marie Dupont"/></div>'+
       '<div class="form-group"><label>Email</label><input id="rEmail" type="email" placeholder="votre@email.fr"/></div>'+
       '<div class="form-group"><label>Mot de passe</label><div class="pw-wrap"><input id="rPass" type="password" placeholder="Min. 6 caractères"/><button class="pw-eye" onclick="togglePw(\'rPass\',this)" type="button">👁</button></div></div>'+
@@ -230,45 +234,64 @@ function doLogin(){
 function doRegister(role){
   var contact=val('rContact'),email=val('rEmail'),pass=val('rPass'),pass2=val('rPass2');
   var existingId=val('rExisting'),societe=val('rSociete'),secteur=val('rSecteur'),desc=val('rDesc');
+  var inviteCode=val('rInviteCode');
   if(!contact||!email||!pass){setMsg('Remplissez tous les champs.','warn');return;}
   if(!existingId&&(!societe||!secteur)){setMsg('Renseignez la société et le secteur.','warn');return;}
   if(pass!==pass2){setMsg('Mots de passe différents.','warn');return;}
   if(pass.length<6){setMsg('Mot de passe trop court.','warn');return;}
   if(!ge('rRgpd')||!ge('rRgpd').checked){setMsg('Vous devez accepter la politique de confidentialité.','warn');return;}
-  setMsg('Création...','info');
-  var file=ge('rLogo')&&ge('rLogo').files&&ge('rLogo').files[0];
-  function proceed(logoUrl){
-    sb.auth.signUp({email:email,password:pass}).then(function(res){
-      if(res.error){setMsg('❌ '+res.error.message,'error');return;}
-      var uid=res.data.user.id;
-      sb.from('profiles').insert({id:uid,role:role,name:existingId?'':societe,sector:existingId?'':secteur,contact:contact,description:desc}).then(function(){
-        if(existingId){
-          var mt=role==='partner'?'partner_members':'startup_members';
-          var col=role==='partner'?'partner_id':'startup_id';
-          var obj={profile_id:uid};obj[col]=existingId;
-          sb.from(mt).insert(obj);
-        } else {
-          var tbl=role==='partner'?'partners':'startups';
-          var data={profile_id:uid,name:societe,sector:secteur,contact:contact,email:email,description:desc,is_vc:false};
-          if(logoUrl)data.logo_url=logoUrl;
-          sb.from(tbl).insert(data).select().single().then(function(r){
-            if(r.data){
-              var mt=role==='partner'?'partner_members':'startup_members';
-              var col=role==='partner'?'partner_id':'startup_id';
-              var obj={profile_id:uid};obj[col]=r.data.id;
-              sb.from(mt).insert(obj);
-            }
-          });
-        }
+
+  function proceed(){
+    var file=ge('rLogo')&&ge('rLogo').files&&ge('rLogo').files[0];
+    function doCreate(logoUrl){
+      sb.auth.signUp({email:email,password:pass}).then(function(res){
+        if(res.error){setMsg('❌ '+res.error.message,'error');return;}
+        var uid=res.data.user.id;
+        sb.from('profiles').insert({id:uid,role:role,name:existingId?'':societe,sector:existingId?'':secteur,contact:contact,description:desc}).then(function(){
+          if(existingId){
+            var mt=role==='partner'?'partner_members':'startup_members';
+            var col=role==='partner'?'partner_id':'startup_id';
+            var obj={profile_id:uid};obj[col]=existingId;
+            sb.from(mt).insert(obj);
+          } else {
+            var tbl=role==='partner'?'partners':'startups';
+            var data={profile_id:uid,name:societe,sector:secteur,contact:contact,email:email,description:desc,is_vc:false};
+            if(logoUrl)data.logo_url=logoUrl;
+            sb.from(tbl).insert(data).select().single().then(function(r){
+              if(r.data){
+                var mt=role==='partner'?'partner_members':'startup_members';
+                var col=role==='partner'?'partner_id':'startup_id';
+                var obj={profile_id:uid};obj[col]=r.data.id;
+                sb.from(mt).insert(obj);
+              }
+            });
+          }
+          // Marquer le code invitation comme utilisé
+          if(role==='partner'&&inviteCode){
+            sb.from('invitations').update({used:true}).eq('code',inviteCode.toUpperCase());
+          }
+        });
+        setMsg('✅ Compte créé ! Connectez-vous.','success');
+        switchTab('login');
       });
-      setMsg('✅ Compte créé ! Connectez-vous.','success');
-      switchTab('login');
-    });
+    }
+    if(file){
+      var path=(role==='partner'?'p':'s')+'_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      sb.storage.from('logos').upload(path,file).then(function(r){doCreate(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
+    } else {doCreate(null);}
   }
-  if(file){
-    var path=(role==='partner'?'p':'s')+'_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    sb.storage.from('logos').upload(path,file).then(function(r){proceed(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
-  } else {proceed(null);}
+
+  // Vérifier le code d'invitation pour les partenaires
+  if(role==='partner'){
+    if(!inviteCode){setMsg('Le code d\'invitation est obligatoire.','warn');return;}
+    setMsg('Vérification du code...','info');
+    sb.from('invitations').select('*').eq('code',inviteCode.toUpperCase()).eq('used',false).single().then(function(r){
+      if(r.error||!r.data){setMsg('❌ Code invalide ou déjà utilisé.','error');return;}
+      proceed();
+    });
+  } else {
+    proceed();
+  }
 }
 
 function logout(){
@@ -362,9 +385,11 @@ function pgDashboard(el){
     sb.from('partners').select('*',{count:'exact',head:true}),
     sb.from('startups').select('*',{count:'exact',head:true}),
     sb.from('slots').select('*',{count:'exact',head:true}).eq('status','booked'),
-    sb.from('slots').select('*',{count:'exact',head:true}).eq('status','pending')
+    sb.from('slots').select('*',{count:'exact',head:true}).eq('status','pending'),
+    sb.from('invitations').select('*').eq('used',false)
   ]).then(function(r){
     var nbP=r[0].count||0,nbS=r[1].count||0,nbRdv=r[2].count||0,nbPend=r[3].count||0;
+    var invitations=r[4].data||[];
     sb.from('slots').select('id,time,comment,pitch_deck_url,startups(id,name,contact,email),partners(name,is_vc)').eq('status','pending').order('time').then(function(rp){
       var pend=rp.data||[];
       el.innerHTML='<h1>Tableau de bord</h1><div class="subtitle">B2B Matchmaking 2026</div>'+
@@ -374,6 +399,22 @@ function pgDashboard(el){
         '<div class="stat-box"><div class="stat-num">'+nbRdv+'</div><div class="stat-label">RDV confirmés</div></div>'+
         '<div class="stat-box" style="border:2px solid #ffc107;"><div class="stat-num" style="color:#856404;">'+nbPend+'</div><div class="stat-label">En attente</div></div>'+
         '</div>'+
+        // Gestion des codes d'invitation
+        '<div class="card"><h2>🎟️ Codes d\'invitation partenaires</h2>'+
+        '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">'+
+        '<input id="inviteEmail" placeholder="Email du partenaire (optionnel)" style="flex:1;min-width:200px;"/>'+
+        '<button class="btn btn-primary" onclick="generateInviteCode()">+ Générer un code</button>'+
+        '</div>'+
+        (invitations.length?'<div style="overflow-x:auto;"><table><tr><th>Code</th><th>Email</th><th>Créé le</th><th>Action</th></tr>'+
+        invitations.map(function(inv){
+          return '<tr><td><strong style="color:var(--red);letter-spacing:2px;">'+inv.code+'</strong></td>'+
+            '<td>'+(inv.email||'—')+'</td>'+
+            '<td style="font-size:.76rem;">'+new Date(inv.created_at).toLocaleDateString('fr-FR')+'</td>'+
+            '<td><button class="btn btn-sm btn-outline" onclick="copyCode(\''+inv.code+'\')">📋 Copier</button> '+
+            '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteInvite(\''+inv.id+'\')">🗑</button></td></tr>';
+        }).join('')+'</table></div>':'<p style="color:var(--muted);font-size:.83rem;">Aucun code actif.</p>')+
+        '</div>'+
+        // RDV en attente
         (nbPend>0?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ RDV à valider</h2>'+
         '<div style="overflow-x:auto;"><table><tr><th>Heure</th><th>Partenaire</th><th>Start-up</th><th>Commentaire</th><th>Pitch</th><th>Action</th></tr>'+
         pend.map(function(s){
@@ -388,6 +429,25 @@ function pgDashboard(el){
         }).join('')+'</table></div></div>':'');
     });
   });
+}
+
+function generateInviteCode(){
+  var email=val('inviteEmail');
+  var code='FT'+Math.random().toString(36).substring(2,8).toUpperCase();
+  sb.from('invitations').insert({code:code,email:email||null,role:'partner'}).then(function(r){
+    if(r.error){alert('Erreur : '+r.error.message);return;}
+    alert('✅ Code généré : '+code+(email?' pour '+email:''));
+    navigateTo('dashboard');
+  });
+}
+
+function copyCode(code){
+  navigator.clipboard.writeText(code).then(function(){alert('✅ Code copié : '+code);});
+}
+
+function deleteInvite(id){
+  if(!confirm('Supprimer ce code ?'))return;
+  sb.from('invitations').delete().eq('id',id).then(function(){navigateTo('dashboard');});
 }
 
 function adminValidate(id){sb.from('slots').update({status:'booked'}).eq('id',id).then(function(){alert('✅ RDV validé !');navigateTo('dashboard');});}
