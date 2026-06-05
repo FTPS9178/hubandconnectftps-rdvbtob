@@ -285,8 +285,8 @@ function doRegister(role){
   if(role==='partner'){
     if(!inviteCode){setMsg('Le code d\'invitation est obligatoire.','warn');return;}
     setMsg('Vérification du code...','info');
-    sb.from('invitations').select('*').eq('code',inviteCode.toUpperCase()).eq('used',false).single().then(function(r){
-      if(r.error||!r.data){setMsg('❌ Code invalide ou déjà utilisé.','error');return;}
+    sb.from('invitations').select('*').eq('code',inviteCode.toUpperCase()).single().then(function(r){
+      if(r.error||!r.data){setMsg('❌ Code invalide.','error');return;}
       proceed();
     });
   } else {
@@ -399,20 +399,17 @@ function pgDashboard(el){
         '<div class="stat-box"><div class="stat-num">'+nbRdv+'</div><div class="stat-label">RDV confirmés</div></div>'+
         '<div class="stat-box" style="border:2px solid #ffc107;"><div class="stat-num" style="color:#856404;">'+nbPend+'</div><div class="stat-label">En attente</div></div>'+
         '</div>'+
-        // Gestion des codes d'invitation
-        '<div class="card"><h2>🎟️ Codes d\'invitation partenaires</h2>'+
-        '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">'+
-        '<input id="inviteEmail" placeholder="Email du partenaire (optionnel)" style="flex:1;min-width:200px;"/>'+
-        '<button class="btn btn-primary" onclick="generateInviteCode()">+ Générer un code</button>'+
-        '</div>'+
-        (invitations.length?'<div style="overflow-x:auto;"><table><tr><th>Code</th><th>Email</th><th>Créé le</th><th>Action</th></tr>'+
-        invitations.map(function(inv){
-          return '<tr><td><strong style="color:var(--red);letter-spacing:2px;">'+inv.code+'</strong></td>'+
-            '<td>'+(inv.email||'—')+'</td>'+
-            '<td style="font-size:.76rem;">'+new Date(inv.created_at).toLocaleDateString('fr-FR')+'</td>'+
-            '<td><button class="btn btn-sm btn-outline" onclick="copyCode(\''+inv.code+'\')">📋 Copier</button> '+
-            '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteInvite(\''+inv.id+'\')">🗑</button></td></tr>';
-        }).join('')+'</table></div>':'<p style="color:var(--muted);font-size:.83rem;">Aucun code actif.</p>')+
+        // Gestion du code d'invitation unique
+        '<div class="card"><h2>🎟️ Code d\'invitation partenaires</h2>'+
+        '<p style="font-size:.83rem;color:var(--muted);margin-bottom:12px;">Ce code unique est valable pour tous les partenaires invités — il peut être réutilisé.</p>'+
+        (invitations.length?
+          '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'+
+          '<div style="font-size:1.5rem;font-weight:800;color:var(--red);letter-spacing:4px;padding:12px 20px;background:#fff5f7;border-radius:8px;border:2px dashed var(--red);">'+invitations[0].code+'</div>'+
+          '<div class="btn-group" style="margin:0;">'+
+          '<button class="btn btn-primary" onclick="copyCode(\''+invitations[0].code+'\')">📋 Copier</button>'+
+          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="regenerateCode(\''+invitations[0].id+'\')">🔄 Régénérer</button>'+
+          '</div></div>':
+          '<button class="btn btn-primary" onclick="generateInviteCode()">+ Créer le code</button>')+
         '</div>'+
         // RDV en attente
         (nbPend>0?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ RDV à valider</h2>'+
@@ -432,12 +429,18 @@ function pgDashboard(el){
 }
 
 function generateInviteCode(){
-  var email=val('inviteEmail');
   var code='FT'+Math.random().toString(36).substring(2,8).toUpperCase();
-  sb.from('invitations').insert({code:code,email:email||null,role:'partner'}).then(function(r){
+  sb.from('invitations').insert({code:code,role:'partner'}).then(function(r){
     if(r.error){alert('Erreur : '+r.error.message);return;}
-    alert('✅ Code généré : '+code+(email?' pour '+email:''));
     navigateTo('dashboard');
+  });
+}
+
+function regenerateCode(id){
+  if(!confirm('Régénérer un nouveau code ? L\'ancien ne sera plus valide.'))return;
+  var code='FT'+Math.random().toString(36).substring(2,8).toUpperCase();
+  sb.from('invitations').update({code:code}).eq('id',id).then(function(){
+    alert('✅ Nouveau code : '+code);navigateTo('dashboard');
   });
 }
 
