@@ -518,7 +518,10 @@ function pgMyAccount(el){
 // ✅ saveAccount corrigé — pas d'appel auth inutile
 function saveAccount(){
   var contact=val('acContact').trim();
+  var societe=val('acSociete'),sector=val('acSector'),desc=val('acDesc');
+  var pass=val('acPass'),pass2=val('acPass2');
   if(!contact){alert('Prénom et nom obligatoires.');return;}
+  if(pass&&pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
   if(pass&&pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
   var fileInput=ge('acLogo');
   var file=fileInput&&fileInput.files&&fileInput.files.length>0?fileInput.files[0]:null;
