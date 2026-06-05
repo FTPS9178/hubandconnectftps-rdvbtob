@@ -10,16 +10,18 @@
 :root{--red:#FF0032;--dark:#1a1a2e;--gray:#f4f4f7;--border:#e0e0e0;--text:#222;--muted:#888;--green:#00b894;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',sans-serif;background:var(--gray);color:var(--text);padding-bottom:56px;}
-nav{background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:56px;position:sticky;top:0;z-index:40;}
-.nav-menu{display:none;position:fixed;top:56px;left:0;right:0;background:var(--dark);z-index:39;padding:8px;flex-direction:column;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,.3);}
-.nav-menu.open{display:flex;}
-.nav-menu button{background:none;border:none;color:#ccc;cursor:pointer;padding:10px 14px;border-radius:6px;font-size:.9rem;text-align:left;width:100%;}
-.nav-menu button:hover,.nav-menu button.active{background:var(--red);color:#fff;}
-.hamburger{background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:4px 8px;}
-@media(min-width:700px){
-  .hamburger{display:none;}
-  .nav-menu{display:flex!important;position:static;flex-direction:row;flex-wrap:wrap;padding:0;box-shadow:none;background:transparent;}
-  .nav-menu button{padding:6px 10px;font-size:.78rem;width:auto;}
+nav{background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;position:sticky;top:0;z-index:40;}
+.nav-links-desktop{display:flex;gap:2px;flex-wrap:wrap;}
+.nav-links-desktop button{background:none;border:none;color:#ccc;cursor:pointer;padding:6px 10px;border-radius:6px;font-size:.78rem;}
+.nav-links-desktop button:hover,.nav-links-desktop button.active{background:var(--red);color:#fff;}
+.hamburger{display:none;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:4px 8px;}
+.nav-menu-mobile{display:none;position:fixed;top:56px;left:0;right:0;background:var(--dark);z-index:39;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,.4);}
+.nav-menu-mobile button{display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;padding:12px 16px;border-radius:6px;font-size:.9rem;text-align:left;}
+.nav-menu-mobile button:hover,.nav-menu-mobile button.active{background:var(--red);color:#fff;}
+.nav-menu-mobile.open{display:block;}
+@media(max-width:700px){
+  .nav-links-desktop{display:none;}
+  .hamburger{display:block;}
 }
 .page{display:none;padding:16px;max-width:1100px;margin:auto;}
 .page.active{display:block;}
@@ -429,22 +431,22 @@ function renderNav(){
     partner:[{id:'myPlanning',label:'📅 Planning'},{id:'myRdv',label:'📋 Mes RDV'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'myPDF',label:'📄 PDF'},{id:'myAccount',label:'👤 Mon compte'}],
     startup:[{id:'partners',label:'🏢 RDV'},{id:'myRdvStartup',label:'📋 Mes RDV'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'myAgenda',label:'📅 Agenda'},{id:'myPDF',label:'📄 PDF'},{id:'myAccount',label:'👤 Mon compte'}]
   };
-  ge('navLinks').innerHTML=(links[state.role]||[]).map(function(l){
+  var btns=(links[state.role]||[]).map(function(l){
     return '<button onclick="navigateTo(\''+l.id+'\')" id="nav_'+l.id+'">'+l.label+'</button>';
   }).join('');
+  ge('navLinks').innerHTML=btns;
+  ge('navLinksMobile').innerHTML=btns.replace(/id="nav_/g,'id="mav_');
 }
 
 function toggleMenu(){
-  var m=ge('navLinks');
-  m.classList.toggle('open');
+  ge('navLinksMobile').classList.toggle('open');
 }
 
 function navigateTo(page){
-  // Fermer le menu mobile
-  var m=ge('navLinks');
-  if(m)m.classList.remove('open');
-  document.querySelectorAll('.nav-menu button').forEach(function(b){b.classList.remove('active');});
+  ge('navLinksMobile').classList.remove('open');
+  document.querySelectorAll('#navLinks button,#navLinksMobile button').forEach(function(b){b.classList.remove('active');});
   var btn=ge('nav_'+page);if(btn)btn.classList.add('active');
+  var mbtn=ge('mav_'+page);if(mbtn)mbtn.classList.add('active');
   ge('pageContainer').innerHTML='';
   var div=document.createElement('div');div.className='page active';div.dataset.page=page;
   ge('pageContainer').appendChild(div);
