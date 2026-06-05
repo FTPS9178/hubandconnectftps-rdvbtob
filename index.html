@@ -175,11 +175,65 @@ function sendReset(){
 
 function showRegister(){
   ge('authForm').innerHTML=
-    '<p style="font-size:.83rem;font-weight:600;margin-bottom:10px;color:#444;">Vous êtes :</p>'+
-    '<div class="role-select">'+
-    '<div class="role-btn" onclick="showRegFields(\'partner\',this)"><span class="icon">🏢</span>Partenaire</div>'+
-    '<div class="role-btn" onclick="showRegFields(\'startup\',this)"><span class="icon">🚀</span>Start-up</div>'+
-    '</div><div id="regFields"></div>';
+    '<div id="regFields"></div>';
+  // Charger directement les deux options
+  sb.from('startups').select('id,name').order('name').then(function(res1){
+    sb.from('partners').select('id,name').order('name').then(function(res2){
+      var existingStartups=res1.data||[];
+      var existingPartners=res2.data||[];
+      ge('regFields').innerHTML=
+        // Champ contact commun
+        '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label><input id="rContact" placeholder="Ex: Marie Dupont"/></div>'+
+        '<div class="form-group"><label>Email</label><input id="rEmail" type="email" placeholder="votre@email.fr"/></div>'+
+        '<div class="form-group"><label>Mot de passe</label><div class="pw-wrap"><input id="rPass" type="password" placeholder="Min. 6 caractères"/><button class="pw-eye" onclick="togglePw(\'rPass\',this)" type="button">👁</button></div></div>'+
+        '<div class="form-group"><label>Confirmer</label><div class="pw-wrap"><input id="rPass2" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'rPass2\',this)" type="button">👁</button></div></div>'+
+        '<hr style="margin:14px 0;border-color:var(--border);">'+
+        // Choix du rôle
+        '<p style="font-size:.83rem;font-weight:600;margin-bottom:10px;color:#444;">Vous êtes :</p>'+
+        '<div class="role-select" style="margin-bottom:14px;">'+
+        '<div class="role-btn" id="roleStartup" onclick="selectRole(\'startup\')"><span class="icon">🚀</span>Start-up / Porteur de projet</div>'+
+        '<div class="role-btn" id="rolePartner" onclick="selectRole(\'partner\')"><span class="icon">🏢</span>Partenaire</div>'+
+        '</div>'+
+        // Champs spécifiques au rôle
+        '<div id="roleFields"></div>'+
+        // RGPD
+        '<div class="form-group" style="margin-top:10px;">'+
+        '<label style="display:flex;align-items:flex-start;gap:8px;font-weight:normal;cursor:pointer;">'+
+        '<input type="checkbox" id="rRgpd" style="width:auto;margin-top:3px;flex-shrink:0;"/>'+
+        '<span style="font-size:.8rem;">J\'accepte que mes données soient traitées dans le cadre du B2B Matchmaking 2026 conformément à notre <a href="#" onclick="showRgpd();return false;" style="color:var(--red);">politique de confidentialité</a>.</span>'+
+        '</label></div>'+
+        '<button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="doRegister(window._selectedRole)">S\'inscrire →</button>';
+
+      window._existingStartups=existingStartups;
+      window._existingPartners=existingPartners;
+    });
+  });
+}
+
+function selectRole(role){
+  window._selectedRole=role;
+  document.querySelectorAll('.role-btn').forEach(function(b){b.classList.remove('active');});
+  ge('role'+(role==='startup'?'Startup':'Partner')).classList.add('active');
+  var existing=role==='startup'?window._existingStartups:window._existingPartners;
+  var sectors=role==='startup'?SSECTORS:PSECTORS;
+  ge('roleFields').innerHTML=
+    (role==='partner'?
+      '<div class="form-group"><label>Code d\'invitation <span style="color:var(--red);">*</span></label>'+
+      '<input id="rInviteCode" placeholder="Ex: FT3X9K2M"/></div>':'')+
+    '<div class="form-group"><label>Rejoindre une société existante</label>'+
+    '<select id="rExisting" onchange="toggleNewSoc(this.value)">'+
+    '<option value="">-- Nouvelle société --</option>'+
+    existing.map(function(e){return '<option value="'+e.id+'">'+e.name+'</option>';}).join('')+
+    '</select></div>'+
+    '<div id="newSocFields">'+
+    '<div class="form-group"><label>Nom de la société</label><input id="rSociete"/></div>'+
+    '<div class="form-group"><label>Secteur</label><select id="rSecteur"><option value="">-- Choisissez --</option>'+
+    sectors.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label>Description de l\'activité</label><textarea id="rDesc" rows="2"></textarea></div>'+
+    '<div class="form-group"><label>🔗 LinkedIn</label><input id="rLinkedin" placeholder="https://linkedin.com/company/..."/></div>'+
+    '<div class="form-group"><label>🌐 Site web</label><input id="rWebsite" placeholder="https://www.monsite.fr"/></div>'+
+    '<div class="form-group"><label>Logo</label><input type="file" id="rLogo" accept="image/*"/></div>'+
+    '</div>';
 }
 
 function showRegFields(role,el){
@@ -232,6 +286,7 @@ function doLogin(){
 }
 
 function doRegister(role){
+  if(!role){setMsg('Choisissez votre rôle (Start-up ou Partenaire).','warn');return;}
   var contact=val('rContact'),email=val('rEmail'),pass=val('rPass'),pass2=val('rPass2');
   var existingId=val('rExisting'),societe=val('rSociete'),secteur=val('rSecteur'),desc=val('rDesc');
   var inviteCode=val('rInviteCode');
