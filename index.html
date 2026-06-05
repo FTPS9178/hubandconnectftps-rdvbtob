@@ -102,7 +102,7 @@ td{padding:6px 8px;border-bottom:1px solid var(--border);}
   <div class="login-wrap">
     <div class="login-box">
       <div style="text-align:center;margin-bottom:20px;">
-        <img src="https://ftps9178.github.io/matching-ftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" alt="French Tech Paris-Saclay" style="height:68px;object-fit:contain;"/>
+        <img src="https://ftps9178.github.io/hubandconnectftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" alt="French Tech Paris-Saclay" style="height:68px;object-fit:contain;"/>
         <div style="color:#888;font-size:.82rem;margin-top:6px;">B2B Matchmaking 2026</div>
       </div>
       <div class="tabs">
@@ -118,7 +118,7 @@ td{padding:6px 8px;border-bottom:1px solid var(--border);}
 <div id="app" style="display:none;">
   <nav>
     <div class="nav-top">
-      <img src="https://ftps9178.github.io/matching-ftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" alt="FT" style="height:36px;object-fit:contain;"/>
+      <img src="https://ftps9178.github.io/hubandconnectftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" alt="FT" style="height:36px;object-fit:contain;"/>
       <div style="display:flex;align-items:center;gap:8px;">
         <span id="userLabel" style="color:#aaa;font-size:.75rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
         <button class="btn btn-sm" style="color:#fff;border:1px solid #555;white-space:nowrap;" onclick="logout()">Déco</button>
@@ -178,7 +178,7 @@ function showForgot(){
 function sendReset(){
   var email=val('aEmail');
   if(!email){setMsg('Entrez votre email.','warn');return;}
-  sb.auth.resetPasswordForEmail(email,{redirectTo:'https://ftps9178.github.io/matching-ftps-rdvbtob/'}).then(function(r){
+  sb.auth.resetPasswordForEmail(email,{redirectTo:'https://ftps9178.github.io/hubandconnectftps-rdvbtob/'}).then(function(r){
     setMsg(r.error?'❌ '+r.error.message:'✅ Email envoyé !',r.error?'error':'success');
   });
 }
