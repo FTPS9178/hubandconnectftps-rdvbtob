@@ -627,7 +627,7 @@ function buildPartners(el,partners,activeFilter){
         (state.role==='startup'?'<button class="btn btn-primary btn-sm" onclick="openBooking(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\','+!!p.is_vc+')">Prendre RDV →</button>':'')+
         (state.role==='admin'?'<button class="btn btn-outline btn-sm" onclick="openBooking(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\','+!!p.is_vc+')">Planning</button>'+
           '<button class="btn btn-sm btn-dark" onclick="toggleVC(\''+p.id+'\','+!!p.is_vc+')">'+(p.is_vc?'Retirer VC':'VC\'s')+'</button>'+
-          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="blockSlots(\''+p.id+'\')">🔒</button>'+
+          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="blockSlots(\''+p.id+'\')">🔒 Créneaux</button>'+
           '<button class="btn btn-sm" style="background:#f0f0f0;" onclick="editPartner(decodeURIComponent(\''+pj+'\'))">✏️</button>':'')+'</div></div></div></div>';
     }).join('')+(partners.length===0?'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun partenaire.</p></div>':'');
 }
