@@ -844,7 +844,7 @@ function pgMyRdvStartup(el){
   var s=state.startup;if(!s){el.innerHTML='<p>Profil introuvable.</p>';return;}
   Promise.all([
     sb.from('slots').select('*,partners(name,contact,sector,description,logo_url,is_vc)').eq('startup_id',s.id).in('status',['pending','booked']).order('time'),
-    sb.from('slots').select('*,partners(name,logo_url)').eq('startup_id',s.id).eq('status','free').not('refusal_comment','is',null).order('time')
+    sb.from('slots').select('*,partners(name,logo_url)').eq('cancelled_startup_id',s.id).eq('status','free').not('refusal_comment','is',null).order('time')
   ]).then(function(r){
     var slots=r[0].data||[];
     var refused=r[1].data||[];
