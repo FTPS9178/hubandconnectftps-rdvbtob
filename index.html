@@ -755,8 +755,14 @@ function bookWithWarn(slotId,time,partnerName,isVC){if(!confirm('⚠️ Confére
 
 function openBookForm(slotId,time,partnerName,isVC){
   closeModal();
+  var startupName=state.startup?state.startup.name:'';
+  var startupContact=state.startup?state.startup.contact:'';
   showModal('<h2>📅 RDV avec '+partnerName+'</h2>'+
     '<div style="font-size:.83rem;color:var(--muted);margin-bottom:14px;">Créneau : <strong>'+time+'</strong></div>'+
+    '<div class="card" style="background:#f9f9f9;margin-bottom:14px;">'+
+    '<div style="font-size:.83rem;"><strong>🚀 Structure :</strong> '+startupName+'</div>'+
+    '<div style="font-size:.83rem;margin-top:4px;"><strong>👤 Contact :</strong> '+startupContact+'</div>'+
+    '</div>'+
     '<div class="form-group"><label>Commentaire</label><textarea id="bookComment" rows="3" placeholder="Présentez votre projet..."></textarea></div>'+
     '<div class="form-group"><label>Pitch deck '+(isVC?'<span style="color:var(--red);">*obligatoire</span>':'(facultatif)')+'</label><input type="file" id="bookPitch" accept=".pdf,.ppt,.pptx"/></div>'+
     '<div class="btn-group"><button class="btn btn-primary" onclick="confirmBooking(\''+slotId+'\',\''+time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')">Confirmer →</button>'+
