@@ -1304,7 +1304,10 @@ function generatePDF(){
   }
 }
 
-window.addEventListener('load',function(){checkSession();});
+window.addEventListener('load',function(){
+  showLogin();
+  checkSession();
+});
 </script>
 </body>
 </html>
