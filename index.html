@@ -490,9 +490,23 @@ function openRefuse(slotId,who){
 }
 function confirmRefuse(slotId,who){
   var comment=val('refuseComment');if(!comment){alert('Le motif est obligatoire.');return;}
-  sb.from('slots').update({status:'free',startup_id:null,refusal_comment:comment,comment:null,pitch_deck_url:null,cancelled_by:who}).eq('id',slotId).then(function(){
-    closeModal();alert('RDV refusé.');
-    if(who==='partner')navigateTo('myRdv');else if(who==='startup')navigateTo('myRdvStartup');else navigateTo('dashboard');
+  // D'abord récupérer le startup_id avant de le mettre à null
+  sb.from('slots').select('startup_id').eq('id',slotId).single().then(function(r){
+    var cancelledStartupId=r.data&&r.data.startup_id;
+    sb.from('slots').update({
+      status:'free',
+      startup_id:null,
+      cancelled_startup_id:cancelledStartupId,
+      refusal_comment:comment,
+      comment:null,
+      pitch_deck_url:null,
+      cancelled_by:who
+    }).eq('id',slotId).then(function(){
+      closeModal();alert('RDV refusé.');
+      if(who==='partner')navigateTo('myRdv');
+      else if(who==='startup')navigateTo('myRdvStartup');
+      else navigateTo('dashboard');
+    });
   });
 }
 
@@ -770,12 +784,21 @@ function openBookForm(slotId,time,partnerName,isVC){
 }
 
 function confirmBooking(slotId,time,partnerName,isVC){
+  if(!state.startup||!state.startup.id){
+    alert('❌ Votre profil start-up est incomplet. Contactez l\'administrateur.');
+    return;
+  }
   var comment=val('bookComment');
   var file=ge('bookPitch')&&ge('bookPitch').files&&ge('bookPitch').files[0];
   if(isVC&&!file){alert('Le pitch deck est obligatoire.');return;}
   if(file){
     var path=state.startup.id+'/'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    sb.storage.from('pitchdecks').upload(path,file).then(function(r){if(r.error){alert('Erreur upload.');return;}sb.storage.from('pitchdecks').createSignedUrl(path,86400*30).then(function(sr){doBooking(slotId,comment,sr.data&&sr.data.signedUrl);});});
+    sb.storage.from('pitchdecks').upload(path,file).then(function(r){
+      if(r.error){alert('Erreur upload : '+r.error.message);return;}
+      sb.storage.from('pitchdecks').createSignedUrl(path,86400*30).then(function(sr){
+        doBooking(slotId,comment,sr.data&&sr.data.signedUrl);
+      });
+    });
   } else doBooking(slotId,comment,null);
 }
 
