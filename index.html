@@ -3,32 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>French Tech Paris-Saclay – B2B Matchmaking 2026</title>
+<title>Hub & Connect – French Tech Paris-Saclay</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--red:#FF0032;--dark:#1a1a2e;--gray:#f4f4f7;--border:#e0e0e0;--text:#222;--muted:#888;--green:#00b894;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',sans-serif;background:var(--gray);color:var(--text);padding-bottom:56px;}
-nav{background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;position:sticky;top:0;z-index:40;}
-.nav-links-desktop{display:flex;gap:2px;flex-wrap:wrap;}
-.nav-links-desktop button{background:none;border:none;color:#ccc;cursor:pointer;padding:6px 10px;border-radius:6px;font-size:.78rem;}
-.nav-links-desktop button:hover,.nav-links-desktop button.active{background:var(--red);color:#fff;}
-.hamburger{display:none;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:4px 8px;}
-.nav-menu-mobile{display:none;position:fixed;top:56px;left:0;right:0;background:var(--dark);z-index:39;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,.4);}
-.nav-menu-mobile button{display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;padding:12px 16px;border-radius:6px;font-size:.9rem;text-align:left;}
-.nav-menu-mobile button:hover,.nav-menu-mobile button.active{background:var(--red);color:#fff;}
-.nav-menu-mobile.open{display:block;}
+
+/* NAV */
+.topnav{background:var(--dark);position:sticky;top:0;z-index:40;}
+.topnav-inner{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;}
+.topnav-logo{height:38px;object-fit:contain;}
+.topnav-right{display:flex;align-items:center;gap:8px;}
+.topnav-user{color:#aaa;font-size:.72rem;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.topnav-links{display:flex;gap:2px;padding:0 16px 8px;}
+.topnav-links button{background:none;border:none;color:#ccc;cursor:pointer;padding:6px 10px;border-radius:6px;font-size:.78rem;white-space:nowrap;}
+.topnav-links button:hover,.topnav-links button.active{background:var(--red);color:#fff;}
+.hamburger{display:none;background:none;border:none;color:#fff;font-size:1.8rem;cursor:pointer;line-height:1;padding:0 4px;}
+.mobile-menu{display:none;background:#16213e;padding:8px;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+.mobile-menu.open{display:block;}
+.mobile-menu button{display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;padding:12px 16px;border-radius:6px;font-size:.9rem;text-align:left;}
+.mobile-menu button:hover,.mobile-menu button.active{background:var(--red);color:#fff;}
 @media(max-width:700px){
-  .nav-links-desktop{display:none;}
+  .topnav-links{display:none;}
   .hamburger{display:block;}
 }
-.page{display:none;padding:16px;max-width:1100px;margin:auto;}
+
+/* LAYOUT */
+.page{display:none;padding:20px;max-width:1100px;margin:auto;}
 .page.active{display:block;}
-h1{font-size:1.2rem;margin-bottom:6px;}
-h2{font-size:.95rem;margin-bottom:10px;color:var(--dark);}
-.subtitle{color:var(--muted);font-size:.83rem;margin-bottom:16px;}
-.card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+h1{font-size:1.4rem;margin-bottom:6px;}
+h2{font-size:1rem;margin-bottom:12px;color:var(--dark);}
+.subtitle{color:var(--muted);font-size:.88rem;margin-bottom:20px;}
+.card{background:#fff;border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
 .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:600;margin-left:6px;}
 .badge-red{background:#ffe0e6;color:var(--red);}
 .badge-green{background:#d4f5ee;color:var(--green);}
@@ -40,7 +48,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--red);}
 .pw-wrap{position:relative;}
 .pw-wrap input{padding-right:38px;}
 .pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);background:none;border:none;font-size:.95rem;}
-.btn{display:inline-block;padding:8px 16px;border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn{display:inline-block;padding:8px 18px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
 .btn-primary{background:var(--red);color:#fff;}
 .btn-primary:hover{background:#cc0028;}
 .btn-outline{background:#fff;color:var(--red);border:1.5px solid var(--red);}
@@ -48,12 +56,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--red);}
 .btn-green{background:var(--green);color:#fff;}
 .btn-sm{padding:4px 10px;font-size:.76rem;}
 .btn-group{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-@media(min-width:600px){.grid4{grid-template-columns:repeat(4,1fr);}}
-@media(max-width:600px){.grid2{grid-template-columns:1fr;}.page{padding:12px;}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr 1fr;}.page{padding:14px;}}
+@media(max-width:400px){.grid2,.grid4{grid-template-columns:1fr;}}
+
+/* LOGIN */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--dark) 0%,#16213e 100%);padding:16px;}
-.login-box{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.2);}
+.login-box{background:#fff;border-radius:16px;padding:32px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.2);}
 .tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:2px solid var(--border);}
 .tab{padding:7px 16px;cursor:pointer;border-radius:8px 8px 0 0;font-size:.86rem;font-weight:600;color:var(--muted);border:none;background:none;}
 .tab.active{color:var(--red);border-bottom:2px solid var(--red);margin-bottom:-2px;background:#fff5f7;}
@@ -61,28 +71,31 @@ input:focus,select:focus,textarea:focus{border-color:var(--red);}
 .role-btn{padding:12px 6px;border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-size:.83rem;font-weight:600;color:#666;background:#fff;}
 .role-btn:hover,.role-btn.active{border-color:var(--red);color:var(--red);background:#fff5f7;}
 .role-btn .icon{font-size:1.5rem;display:block;margin-bottom:4px;}
+
+/* SLOTS */
 .slot{padding:5px 3px;border-radius:6px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:all .15s;min-height:36px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;}
 .slot.free{background:#e8f8f2;border-color:#b2e8d4;color:#1a7a5a;}
 .slot.free:hover{background:#b2e8d4;}
 .slot.booked,.slot.unavailable{background:#f0f0f0;border-color:#ddd;color:#bbb;cursor:not-allowed;}
 .slot.pending{background:#fff3cd;border-color:#ffc107;color:#856404;cursor:not-allowed;}
 .slot.mine{background:#ffe0e6;border-color:#ffb3c1;color:var(--red);cursor:default;}
-.slot.conflict{background:#fff3cd;border-color:#ffc107;color:#856404;}
 .slot-name{font-size:.62rem;font-weight:600;}
+
+/* MISC */
 .conf-card{background:#fff;border-radius:10px;padding:14px;border-left:4px solid var(--red);box-shadow:0 2px 6px rgba(0,0,0,.05);margin-bottom:10px;}
 .stat-box{background:#fff;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-.stat-num{font-size:1.6rem;font-weight:800;color:var(--red);}
-.stat-label{font-size:.75rem;color:var(--muted);margin-top:3px;}
+.stat-num{font-size:1.8rem;font-weight:800;color:var(--red);}
+.stat-label{font-size:.78rem;color:var(--muted);margin-top:3px;}
 .alert{padding:9px 14px;border-radius:8px;font-size:.83rem;margin-bottom:12px;}
 .alert-info{background:#e0f0ff;color:#1a5fa0;}
 .alert-success{background:#d4f5ee;color:#1a7a5a;}
 .alert-warn{background:#fff3cd;color:#856404;}
 .alert-error{background:#ffe0e6;color:#c00;}
-table{width:100%;border-collapse:collapse;font-size:.78rem;}
-th{background:var(--dark);color:#fff;padding:6px 8px;text-align:left;}
-td{padding:6px 8px;border-bottom:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:.83rem;}
+th{background:var(--dark);color:#fff;padding:7px 10px;text-align:left;}
+td{padding:7px 10px;border-bottom:1px solid var(--border);}
 .agenda-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);}
-.agenda-time{min-width:55px;font-size:.8rem;font-weight:700;color:var(--red);}
+.agenda-time{min-width:65px;font-size:.8rem;font-weight:700;color:var(--red);}
 .loading{text-align:center;padding:36px;color:var(--muted);}
 .spinner{display:inline-block;width:30px;height:30px;border:3px solid #eee;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -91,21 +104,22 @@ td{padding:6px 8px;border-bottom:1px solid var(--border);}
 @keyframes ticker{0%{transform:translateX(100vw);}100%{transform:translateX(-100%);}}
 .ticker-logo{height:32px;width:auto;object-fit:contain;border-radius:4px;background:#fff;padding:2px;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;}
-.modal-box{background:#fff;border-radius:16px;padding:20px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;}
-.partner-logo{width:48px;height:48px;border-radius:8px;object-fit:contain;border:1px solid var(--border);background:#f9f9f9;flex-shrink:0;}
+.modal-box{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;}
+.partner-logo{width:52px;height:52px;border-radius:8px;object-fit:contain;border:1px solid var(--border);background:#f9f9f9;flex-shrink:0;}
 .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
-.filter-btn{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#555;transition:all .2s;}
+.filter-btn{padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#555;transition:all .2s;}
 .filter-btn:hover,.filter-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="loginPage">
   <div class="login-wrap">
     <div class="login-box">
       <div style="text-align:center;margin-bottom:20px;">
-        <img src="https://ftps9178.github.io/hubandconnectftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" alt="French Tech Paris-Saclay" style="height:68px;object-fit:contain;"/>
-        <div style="color:#888;font-size:.82rem;margin-top:6px;">B2B Matchmaking 2026</div>
+        <img src="https://ftps9178.github.io/hubandconnectftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" alt="French Tech Paris-Saclay" style="height:70px;object-fit:contain;" onerror="this.style.display='none'"/>
+        <div style="color:#888;font-size:.82rem;margin-top:8px;">B2B Matchmaking 2026</div>
       </div>
       <div class="tabs">
         <button class="tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</button>
@@ -117,20 +131,23 @@ td{padding:6px 8px;border-bottom:1px solid var(--border);}
   </div>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
-  <nav>
-    <div class="nav-top">
-      <img src="https://ftps9178.github.io/hubandconnectftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" alt="FT" style="height:36px;object-fit:contain;"/>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span id="userLabel" style="color:#aaa;font-size:.75rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-        <button class="btn btn-sm" style="color:#fff;border:1px solid #555;white-space:nowrap;" onclick="logout()">Déco</button>
+  <div class="topnav">
+    <div class="topnav-inner">
+      <img src="https://ftps9178.github.io/hubandconnectftps-rdvbtob/Logo_FT_Paris-Saclay_Couleur%20-%20Copie.png" class="topnav-logo" onerror="this.style.display='none'"/>
+      <div class="topnav-right">
+        <span id="userLabel" class="topnav-user"></span>
+        <button class="btn btn-sm" style="color:#fff;border:1px solid #555;" onclick="logout()">Déco</button>
+        <button class="hamburger" onclick="toggleMenu()">☰</button>
       </div>
     </div>
-    <div class="nav-links" id="navLinks"></div>
-  </nav>
+    <div class="topnav-links" id="navLinks"></div>
+    <div class="mobile-menu" id="mobileMenu"></div>
+  </div>
   <div id="pageContainer"></div>
   <div class="ticker-wrap">
-    <span style="color:#aaa;font-size:.75rem;padding:0 10px;white-space:nowrap;flex-shrink:0;">Présents :</span>
+    <span style="color:#aaa;font-size:.78rem;padding:0 16px;white-space:nowrap;flex-shrink:0;">Ils seront présents :</span>
     <div style="overflow:hidden;flex:1;"><div class="ticker-inner" id="tickerInner"></div></div>
   </div>
 </div>
@@ -153,6 +170,7 @@ function spinEl(el){el.innerHTML='<div class="loading"><div class="spinner"></di
 function togglePw(id,btn){var i=ge(id);i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'👁':'🙈';}
 function closeModal(){var m=document.querySelector('.modal-overlay');if(m)m.remove();}
 function showModal(html){var o=document.createElement('div');o.className='modal-overlay';o.innerHTML='<div class="modal-box">'+html+'</div>';document.body.appendChild(o);}
+function toggleMenu(){var m=ge('mobileMenu');if(m)m.classList.toggle('open');}
 
 function switchTab(tab){
   ge('tabLogin').classList.toggle('active',tab==='login');
@@ -186,103 +204,52 @@ function sendReset(){
 }
 
 function showRegister(){
-  ge('authForm').innerHTML=
-    '<div id="regFields"></div>';
-  // Charger directement les deux options
-  sb.from('startups').select('id,name').order('name').then(function(res1){
-    sb.from('partners').select('id,name').order('name').then(function(res2){
-      var existingStartups=res1.data||[];
-      var existingPartners=res2.data||[];
+  ge('authForm').innerHTML='<div id="regFields"></div>';
+  sb.from('startups').select('id,name').order('name').then(function(r1){
+    sb.from('partners').select('id,name').order('name').then(function(r2){
+      window._exS=r1.data||[];window._exP=r2.data||[];
       ge('regFields').innerHTML=
-        // Champ contact commun
         '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label><input id="rContact" placeholder="Ex: Marie Dupont"/></div>'+
         '<div class="form-group"><label>Email</label><input id="rEmail" type="email" placeholder="votre@email.fr"/></div>'+
         '<div class="form-group"><label>Mot de passe</label><div class="pw-wrap"><input id="rPass" type="password" placeholder="Min. 6 caractères"/><button class="pw-eye" onclick="togglePw(\'rPass\',this)" type="button">👁</button></div></div>'+
         '<div class="form-group"><label>Confirmer</label><div class="pw-wrap"><input id="rPass2" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'rPass2\',this)" type="button">👁</button></div></div>'+
-        '<hr style="margin:14px 0;border-color:var(--border);">'+
-        // Choix du rôle
+        '<hr style="margin:12px 0;border-color:var(--border);">'+
         '<p style="font-size:.83rem;font-weight:600;margin-bottom:10px;color:#444;">Vous êtes :</p>'+
-        '<div class="role-select" style="margin-bottom:14px;">'+
+        '<div class="role-select">'+
         '<div class="role-btn" id="roleStartup" onclick="selectRole(\'startup\')"><span class="icon">🚀</span>Start-up / Porteur de projet</div>'+
         '<div class="role-btn" id="rolePartner" onclick="selectRole(\'partner\')"><span class="icon">🏢</span>Partenaire</div>'+
         '</div>'+
-        // Champs spécifiques au rôle
         '<div id="roleFields"></div>'+
-        // RGPD
         '<div class="form-group" style="margin-top:10px;">'+
         '<label style="display:flex;align-items:flex-start;gap:8px;font-weight:normal;cursor:pointer;">'+
         '<input type="checkbox" id="rRgpd" style="width:auto;margin-top:3px;flex-shrink:0;"/>'+
         '<span style="font-size:.8rem;">J\'accepte que mes données soient traitées dans le cadre du B2B Matchmaking 2026 conformément à notre <a href="#" onclick="showRgpd();return false;" style="color:var(--red);">politique de confidentialité</a>.</span>'+
         '</label></div>'+
         '<button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="doRegister(window._selectedRole)">S\'inscrire →</button>';
-
-      window._existingStartups=existingStartups;
-      window._existingPartners=existingPartners;
     });
   });
 }
 
 function selectRole(role){
   window._selectedRole=role;
-  document.querySelectorAll('.role-btn').forEach(function(b){b.classList.remove('active');});
-  ge('role'+(role==='startup'?'Startup':'Partner')).classList.add('active');
-  var existing=role==='startup'?window._existingStartups:window._existingPartners;
+  ge('roleStartup').classList.toggle('active',role==='startup');
+  ge('rolePartner').classList.toggle('active',role==='partner');
+  var existing=role==='startup'?window._exS:window._exP;
   var sectors=role==='startup'?SSECTORS:PSECTORS;
   ge('roleFields').innerHTML=
-    (role==='partner'?
-      '<div class="form-group"><label>Code d\'invitation <span style="color:var(--red);">*</span></label>'+
-      '<input id="rInviteCode" placeholder="Ex: FT3X9K2M"/></div>':'')+
+    (role==='partner'?'<div class="form-group"><label>Code d\'invitation <span style="color:var(--red);">*</span></label><input id="rInviteCode" placeholder="Ex: FTL6S93W"/></div>':'')+
     '<div class="form-group"><label>Rejoindre une société existante</label>'+
-    '<select id="rExisting" onchange="toggleNewSoc(this.value)">'+
-    '<option value="">-- Nouvelle société --</option>'+
-    existing.map(function(e){return '<option value="'+e.id+'">'+e.name+'</option>';}).join('')+
-    '</select></div>'+
+    '<select id="rExisting" onchange="toggleNewSoc(this.value)"><option value="">-- Nouvelle société --</option>'+
+    existing.map(function(e){return '<option value="'+e.id+'">'+e.name+'</option>';}).join('')+'</select></div>'+
     '<div id="newSocFields">'+
     '<div class="form-group"><label>Nom de la société</label><input id="rSociete"/></div>'+
     '<div class="form-group"><label>Secteur</label><select id="rSecteur"><option value="">-- Choisissez --</option>'+
     sectors.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
-    '<div class="form-group"><label>Description de l\'activité</label><textarea id="rDesc" rows="2"></textarea></div>'+
+    '<div class="form-group"><label>Description</label><textarea id="rDesc" rows="2"></textarea></div>'+
     '<div class="form-group"><label>🔗 LinkedIn</label><input id="rLinkedin" placeholder="https://linkedin.com/company/..."/></div>'+
     '<div class="form-group"><label>🌐 Site web</label><input id="rWebsite" placeholder="https://www.monsite.fr"/></div>'+
     '<div class="form-group"><label>Logo</label><input type="file" id="rLogo" accept="image/*"/></div>'+
     '</div>';
-}
-
-function showRegFields(role,el){
-  document.querySelectorAll('.role-btn').forEach(function(b){b.classList.remove('active');});
-  el.classList.add('active');
-  var sectors=role==='partner'?PSECTORS:SSECTORS;
-  sb.from(role==='partner'?'partners':'startups').select('id,name').order('name').then(function(res){
-    var existing=res.data||[];
-    var inviteField=role==='partner'?
-      '<div class="form-group"><label>Code d\'invitation <span style="color:var(--red);">*</span></label>'+
-      '<input id="rInviteCode" placeholder="Entrez votre code d\'invitation"/></div>':'';
-    ge('regFields').innerHTML=
-      inviteField+
-      '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label><input id="rContact" placeholder="Ex: Marie Dupont"/></div>'+
-      '<div class="form-group"><label>Email</label><input id="rEmail" type="email" placeholder="votre@email.fr"/></div>'+
-      '<div class="form-group"><label>Mot de passe</label><div class="pw-wrap"><input id="rPass" type="password" placeholder="Min. 6 caractères"/><button class="pw-eye" onclick="togglePw(\'rPass\',this)" type="button">👁</button></div></div>'+
-      '<div class="form-group"><label>Confirmer</label><div class="pw-wrap"><input id="rPass2" type="password" placeholder="••••••••"/><button class="pw-eye" onclick="togglePw(\'rPass2\',this)" type="button">👁</button></div></div>'+
-      '<hr style="margin:12px 0;border-color:var(--border);">'+
-      '<div class="form-group"><label>Rejoindre une société existante</label>'+
-      '<select id="rExisting" onchange="toggleNewSoc(this.value)">'+
-      '<option value="">-- Nouvelle société --</option>'+
-      existing.map(function(e){return '<option value="'+e.id+'">'+e.name+'</option>';}).join('')+
-      '</select></div>'+
-      '<div id="newSocFields">'+
-      '<div class="form-group"><label>Nom de la société</label><input id="rSociete"/></div>'+
-      '<div class="form-group"><label>Secteur</label><select id="rSecteur"><option value="">-- Choisissez --</option>'+
-      sectors.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
-      '<div class="form-group"><label>Description</label><textarea id="rDesc" rows="2"></textarea></div>'+
-      '<div class="form-group"><label>Logo</label><input type="file" id="rLogo" accept="image/*"/></div>'+
-      '</div>'+
-      '<div class="form-group" style="margin-top:8px;">'+
-      '<label style="display:flex;align-items:flex-start;gap:8px;font-weight:normal;cursor:pointer;">'+
-      '<input type="checkbox" id="rRgpd" style="width:auto;margin-top:3px;flex-shrink:0;"/>'+
-      '<span style="font-size:.8rem;">J\'accepte que mes données soient traitées dans le cadre du B2B Matchmaking 2026 conformément à notre <a href="#" onclick="showRgpd();return false;" style="color:var(--red);">politique de confidentialité</a>.</span>'+
-      '</label></div>'+
-      '<button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="doRegister(\''+role+'\')">S\'inscrire →</button>';
-  });
 }
 
 function toggleNewSoc(v){var f=ge('newSocFields');if(f)f.style.display=v?'none':'block';}
@@ -292,13 +259,13 @@ function doLogin(){
   if(!email||!pass){setMsg('Remplissez tous les champs.','warn');return;}
   setMsg('Connexion...','info');
   sb.auth.signInWithPassword({email:email,password:pass}).then(function(res){
-    if(res.error){setMsg('❌ Mot de passe incorrect.','error');return;}
+    if(res.error){setMsg('❌ Email ou mot de passe incorrect.','error');return;}
     setMsg('');loadUser(res.data.user);
   });
 }
 
 function doRegister(role){
-  if(!role){setMsg('Choisissez votre rôle (Start-up ou Partenaire).','warn');return;}
+  if(!role){setMsg('Choisissez votre rôle.','warn');return;}
   var contact=val('rContact'),email=val('rEmail'),pass=val('rPass'),pass2=val('rPass2');
   var existingId=val('rExisting'),societe=val('rSociete'),secteur=val('rSecteur'),desc=val('rDesc');
   var inviteCode=val('rInviteCode');
@@ -306,7 +273,7 @@ function doRegister(role){
   if(!existingId&&(!societe||!secteur)){setMsg('Renseignez la société et le secteur.','warn');return;}
   if(pass!==pass2){setMsg('Mots de passe différents.','warn');return;}
   if(pass.length<6){setMsg('Mot de passe trop court.','warn');return;}
-  if(!ge('rRgpd')||!ge('rRgpd').checked){setMsg('Vous devez accepter la politique de confidentialité.','warn');return;}
+  if(!ge('rRgpd')||!ge('rRgpd').checked){setMsg('Acceptez la politique de confidentialité.','warn');return;}
 
   function proceed(){
     var file=ge('rLogo')&&ge('rLogo').files&&ge('rLogo').files[0];
@@ -323,6 +290,9 @@ function doRegister(role){
           } else {
             var tbl=role==='partner'?'partners':'startups';
             var data={profile_id:uid,name:societe,sector:secteur,contact:contact,email:email,description:desc,is_vc:false};
+            var linkedin=val('rLinkedin'),website=val('rWebsite');
+            if(linkedin)data.linkedin_url=linkedin;
+            if(website)data.website_url=website;
             if(logoUrl)data.logo_url=logoUrl;
             sb.from(tbl).insert(data).select().single().then(function(r){
               if(r.data){
@@ -333,10 +303,6 @@ function doRegister(role){
               }
             });
           }
-          // Marquer le code invitation comme utilisé
-          if(role==='partner'&&inviteCode){
-            sb.from('invitations').update({used:true}).eq('code',inviteCode.toUpperCase());
-          }
         });
         setMsg('✅ Compte créé ! Connectez-vous.','success');
         switchTab('login');
@@ -344,11 +310,10 @@ function doRegister(role){
     }
     if(file){
       var path=(role==='partner'?'p':'s')+'_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-      sb.storage.from('logos').upload(path,file).then(function(r){doCreate(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
+      sb.storage.from('logos').upload(path,file,{upsert:true}).then(function(r){doCreate(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
     } else {doCreate(null);}
   }
 
-  // Vérifier le code d'invitation pour les partenaires
   if(role==='partner'){
     if(!inviteCode){setMsg('Le code d\'invitation est obligatoire.','warn');return;}
     setMsg('Vérification du code...','info');
@@ -356,9 +321,7 @@ function doRegister(role){
       if(r.error||!r.data){setMsg('❌ Code invalide.','error');return;}
       proceed();
     });
-  } else {
-    proceed();
-  }
+  } else {proceed();}
 }
 
 function logout(){
@@ -408,10 +371,7 @@ function initSlots(partnerId){
 }
 
 function loadTicker(){
-  Promise.all([
-    sb.from('partners').select('name,logo_url').not('logo_url','is',null),
-    sb.from('startups').select('name,logo_url').not('logo_url','is',null)
-  ]).then(function(r){
+  Promise.all([sb.from('partners').select('name,logo_url').not('logo_url','is',null),sb.from('startups').select('name,logo_url').not('logo_url','is',null)]).then(function(r){
     var inner=ge('tickerInner');if(!inner)return;
     var all=(r[0].data||[]).concat(r[1].data||[]);
     inner.innerHTML=all.map(function(x){return '<img src="'+x.logo_url+'" class="ticker-logo" title="'+x.name+'" onerror="this.style.display=\'none\'"/>';}).join('');
@@ -425,87 +385,27 @@ function subscribeRealtime(){
   }).subscribe();
 }
 
-function checkNavMode(){
-  var isMobile=window.innerWidth<=700;
-  var desktop=ge('navLinks');
-  var hamburger=ge('hamburgerBtn');
-  if(desktop){desktop.style.display=isMobile?'none':'flex';}
-  if(hamburger){hamburger.style.display=isMobile?'block':'none';}
-}
-
 function renderNav(){
   var links={
     admin:[{id:'dashboard',label:'📊 Dashboard'},{id:'partners',label:'🏢 Partenaires'},{id:'startups',label:'🚀 Start-up'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'planning',label:'📅 Planning'},{id:'myAccount',label:'👤 Mon compte'}],
     partner:[{id:'myPlanning',label:'📅 Planning'},{id:'myRdv',label:'📋 Mes RDV'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'myPDF',label:'📄 PDF'},{id:'myAccount',label:'👤 Mon compte'}],
     startup:[{id:'partners',label:'🏢 RDV'},{id:'myRdvStartup',label:'📋 Mes RDV'},{id:'conferences',label:'🎤 Conférences'},{id:'crashtest',label:'🔬 Crash Test'},{id:'myAgenda',label:'📅 Agenda'},{id:'myPDF',label:'📄 PDF'},{id:'myAccount',label:'👤 Mon compte'}]
   };
-
-  // Créer navLinksMobile s'il n'existe pas
-  if(!ge('navLinksMobile')){
-    var mobileNav=document.createElement('div');
-    mobileNav.id='navLinksMobile';
-    mobileNav.style.cssText='display:none;background:var(--dark);position:fixed;top:56px;left:0;right:0;z-index:39;padding:8px;box-shadow:0 4px 16px rgba(0,0,0,.5);';
-    var app=ge('app');
-    if(app)app.insertBefore(mobileNav,ge('pageContainer'));
-  }
-
-  var btns=(links[state.role]||[]).map(function(l){
-    return '<button onclick="navigateTo(\''+l.id+'\')" id="nav_'+l.id+'" style="background:none;border:none;color:#ccc;cursor:pointer;padding:6px 9px;border-radius:6px;font-size:.76rem;white-space:nowrap;">'+l.label+'</button>';
-  }).join('');
-  var mbtns=(links[state.role]||[]).map(function(l){
-    return '<button onclick="navigateTo(\''+l.id+'\')" id="mav_'+l.id+'" style="display:block;width:100%;background:none;border:none;color:#ccc;cursor:pointer;padding:11px 14px;border-radius:6px;font-size:.9rem;text-align:left;">'+l.label+'</button>';
-  }).join('');
-
-  var desktop=ge('navLinks');
-  var mobile=ge('navLinksMobile');
-  if(desktop)desktop.innerHTML=btns;
-  if(mobile)mobile.innerHTML=mbtns;
-  checkNavMode();
-  window.removeEventListener('resize',checkNavMode);
-  window.addEventListener('resize',checkNavMode);
-}
-
-function toggleMenu(){
-  var m=ge('navLinksMobile');
-  if(m)m.style.display=m.style.display==='block'?'none':'block';
+  var items=links[state.role]||[];
+  ge('navLinks').innerHTML=items.map(function(l){return '<button onclick="navigateTo(\''+l.id+'\')" id="nav_'+l.id+'">'+l.label+'</button>';}).join('');
+  ge('mobileMenu').innerHTML=items.map(function(l){return '<button onclick="navigateTo(\''+l.id+'\')" id="mob_'+l.id+'">'+l.label+'</button>';}).join('');
 }
 
 function navigateTo(page){
-  var m=ge('navLinksMobile');
-  if(m)m.style.display='none';
-  var desktop=ge('navLinks');
-  var mobile=ge('navLinksMobile');
-  if(desktop)desktop.querySelectorAll('button').forEach(function(b){b.style.background='none';b.style.color='#ccc';});
-  if(mobile)mobile.querySelectorAll('button').forEach(function(b){b.style.background='none';b.style.color='#ccc';});
-  var btn=ge('nav_'+page);if(btn){btn.style.background='var(--red)';btn.style.color='#fff';}
-  var mbtn=ge('mav_'+page);if(mbtn){mbtn.style.background='var(--red)';mbtn.style.color='#fff';}
-  var pc=ge('pageContainer');
-  if(!pc)return;
-  pc.innerHTML='';
-  var div=document.createElement('div');
-  div.className='page active';
-  div.dataset.page=page;
-  pc.appendChild(div);
-  var pages={dashboard:pgDashboard,partners:pgPartners,startups:pgStartups,conferences:pgConferences,crashtest:pgCrashTest,planning:pgPlanning,myPlanning:pgMyPlanning,myRdv:pgMyRdv,myRdvStartup:pgMyRdvStartup,myAgenda:pgMyAgenda,myPDF:pgMyPDF,myAccount:pgMyAccount};
-  if(pages[page]){pages[page](div);}
-}
-
-function toggleMenu(){
-  var m=ge('navLinksMobile');
-  m.style.display=m.style.display==='block'?'none':'block';
-}
-
-function navigateTo(page){
-  var m=ge('navLinksMobile');if(m)m.style.display='none';
-  document.querySelectorAll('#navLinks button,#navLinksMobile button').forEach(function(b){
-    b.style.background='none';b.style.color='#ccc';
-  });
-  var btn=ge('nav_'+page);if(btn){btn.style.background='var(--red)';btn.style.color='#fff';}
-  var mbtn=ge('mav_'+page);if(mbtn){mbtn.style.background='var(--red)';mbtn.style.color='#fff';}
+  var m=ge('mobileMenu');if(m)m.classList.remove('open');
+  document.querySelectorAll('.topnav-links button,.mobile-menu button').forEach(function(b){b.classList.remove('active');});
+  var b1=ge('nav_'+page);if(b1)b1.classList.add('active');
+  var b2=ge('mob_'+page);if(b2)b2.classList.add('active');
   ge('pageContainer').innerHTML='';
   var div=document.createElement('div');div.className='page active';div.dataset.page=page;
   ge('pageContainer').appendChild(div);
-  ({dashboard:pgDashboard,partners:pgPartners,startups:pgStartups,conferences:pgConferences,crashtest:pgCrashTest,planning:pgPlanning,myPlanning:pgMyPlanning,myRdv:pgMyRdv,myRdvStartup:pgMyRdvStartup,myAgenda:pgMyAgenda,myPDF:pgMyPDF,myAccount:pgMyAccount})[page](div);
+  var pages={dashboard:pgDashboard,partners:pgPartners,startups:pgStartups,conferences:pgConferences,crashtest:pgCrashTest,planning:pgPlanning,myPlanning:pgMyPlanning,myRdv:pgMyRdv,myRdvStartup:pgMyRdvStartup,myAgenda:pgMyAgenda,myPDF:pgMyPDF,myAccount:pgMyAccount};
+  if(pages[page])pages[page](div);
 }
 
 // === DASHBOARD ===
@@ -529,26 +429,24 @@ function pgDashboard(el){
         '<div class="stat-box"><div class="stat-num">'+nbRdv+'</div><div class="stat-label">RDV confirmés</div></div>'+
         '<div class="stat-box" style="border:2px solid #ffc107;"><div class="stat-num" style="color:#856404;">'+nbPend+'</div><div class="stat-label">En attente</div></div>'+
         '</div>'+
-        // Gestion du code d'invitation unique
         '<div class="card"><h2>🎟️ Code d\'invitation partenaires</h2>'+
-        '<p style="font-size:.83rem;color:var(--muted);margin-bottom:12px;">Ce code unique est valable pour tous les partenaires invités — il peut être réutilisé.</p>'+
+        '<p style="font-size:.83rem;color:var(--muted);margin-bottom:12px;">Ce code est valable pour tous les partenaires invités.</p>'+
         (invitations.length?
           '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'+
           '<div style="font-size:1.5rem;font-weight:800;color:var(--red);letter-spacing:4px;padding:12px 20px;background:#fff5f7;border-radius:8px;border:2px dashed var(--red);">'+invitations[0].code+'</div>'+
           '<div class="btn-group" style="margin:0;">'+
           '<button class="btn btn-primary" onclick="copyCode(\''+invitations[0].code+'\')">📋 Copier</button>'+
-          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="regenerateCode(\''+invitations[0].id+'\')">🔄 Régénérer</button>'+
+          '<button class="btn btn-sm btn-outline" onclick="regenerateCode(\''+invitations[0].id+'\')">🔄 Régénérer</button>'+
           '</div></div>':
           '<button class="btn btn-primary" onclick="generateInviteCode()">+ Créer le code</button>')+
         '</div>'+
-        // RDV en attente
-        (nbPend>0?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ RDV à valider</h2>'+
+        (nbPend>0?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ RDV à valider ('+nbPend+')</h2>'+
         '<div style="overflow-x:auto;"><table><tr><th>Heure</th><th>Partenaire</th><th>Start-up</th><th>Commentaire</th><th>Pitch</th><th>Action</th></tr>'+
         pend.map(function(s){
           var su=s.startups||{};
-          var displayName=su.contact&&su.contact.trim()?su.contact:su.email||'-';
+          var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
           return '<tr><td>'+s.time+'</td><td>'+(s.partners?s.partners.name:'-')+(s.partners&&s.partners.is_vc?'<span class="badge badge-vc">VC</span>':'')+'</td>'+
-            '<td>'+(su.name||'-')+' — '+displayName+'</td>'+
+            '<td>'+(su.name||'-')+' — '+dn+'</td>'+
             '<td style="font-size:.76rem;">'+(s.comment||'—')+'</td>'+
             '<td>'+(s.pitch_deck_url?'<a href="'+s.pitch_deck_url+'" target="_blank" class="btn btn-sm btn-outline">📄</a>':'—')+'</td>'+
             '<td><button class="btn btn-green btn-sm" onclick="adminValidate(\''+s.id+'\')">✅</button> '+
@@ -560,29 +458,14 @@ function pgDashboard(el){
 
 function generateInviteCode(){
   var code='FT'+Math.random().toString(36).substring(2,8).toUpperCase();
-  sb.from('invitations').insert({code:code,role:'partner'}).then(function(r){
-    if(r.error){alert('Erreur : '+r.error.message);return;}
-    navigateTo('dashboard');
-  });
+  sb.from('invitations').insert({code:code,role:'partner'}).then(function(){navigateTo('dashboard');});
 }
-
 function regenerateCode(id){
-  if(!confirm('Régénérer un nouveau code ? L\'ancien ne sera plus valide.'))return;
+  if(!confirm('Régénérer un nouveau code ?'))return;
   var code='FT'+Math.random().toString(36).substring(2,8).toUpperCase();
-  sb.from('invitations').update({code:code}).eq('id',id).then(function(){
-    alert('✅ Nouveau code : '+code);navigateTo('dashboard');
-  });
+  sb.from('invitations').update({code:code}).eq('id',id).then(function(){alert('✅ Nouveau code : '+code);navigateTo('dashboard');});
 }
-
-function copyCode(code){
-  navigator.clipboard.writeText(code).then(function(){alert('✅ Code copié : '+code);});
-}
-
-function deleteInvite(id){
-  if(!confirm('Supprimer ce code ?'))return;
-  sb.from('invitations').delete().eq('id',id).then(function(){navigateTo('dashboard');});
-}
-
+function copyCode(code){navigator.clipboard.writeText(code).then(function(){alert('✅ Code copié : '+code);});}
 function adminValidate(id){sb.from('slots').update({status:'booked'}).eq('id',id).then(function(){alert('✅ RDV validé !');navigateTo('dashboard');});}
 
 function openRefuse(slotId,who){
@@ -590,12 +473,11 @@ function openRefuse(slotId,who){
     '<div class="form-group"><label>Motif *</label><textarea id="refuseComment" rows="3"></textarea></div>'+
     '<div class="btn-group"><button class="btn btn-primary" onclick="confirmRefuse(\''+slotId+'\',\''+who+'\')">Confirmer</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
-
 function confirmRefuse(slotId,who){
   var comment=val('refuseComment');if(!comment){alert('Le motif est obligatoire.');return;}
   sb.from('slots').update({status:'free',startup_id:null,refusal_comment:comment,comment:null,pitch_deck_url:null,cancelled_by:who}).eq('id',slotId).then(function(){
     closeModal();alert('RDV refusé.');
-    if(who==='partner'){navigateTo('myRdv');}else if(who==='startup'){navigateTo('myRdvStartup');}else{navigateTo('dashboard');}
+    if(who==='partner')navigateTo('myRdv');else if(who==='startup')navigateTo('myRdvStartup');else navigateTo('dashboard');
   });
 }
 
@@ -605,12 +487,11 @@ function pgMyAccount(el){
   var tbl=state.role==='partner'?'partners':'startups';
   sb.from(tbl).select('*').eq('profile_id',state.user.id).single().then(function(re){
     var entity=(!re.error&&re.data)?re.data:(state.role==='partner'?state.partner:state.startup);
-    if(entity){if(state.role==='partner'){state.partner=entity;}else{state.startup=entity;}}
+    if(entity){if(state.role==='partner')state.partner=entity;else state.startup=entity;}
     var contactVal=entity?entity.contact:(state.profile.contact||'');
     el.innerHTML='<h1>Mon compte</h1><div class="subtitle">Gérez vos informations</div><div class="card">'+
       '<h2>👤 Informations personnelles</h2>'+
-      '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label>'+
-      '<input id="acContact" value="'+contactVal+'" placeholder="Ex: Marie Dupont"/></div>'+
+      '<div class="form-group"><label>Contact <span style="color:var(--muted);font-size:.76rem;">(Prénom Nom)</span></label><input id="acContact" value="'+contactVal+'" placeholder="Ex: Marie Dupont"/></div>'+
       '<hr style="margin:14px 0;border-color:var(--border);">'+
       '<h2>'+(state.role==='partner'?'🏢 Mon entreprise':'🚀 Ma start-up')+'</h2>'+
       (entity&&entity.logo_url?'<div style="margin-bottom:12px;"><img src="'+entity.logo_url+'" style="height:56px;border-radius:8px;border:1px solid var(--border);"/></div>':'')+
@@ -647,52 +528,34 @@ function saveAccount(){
   var passEl=ge('acPass'),pass2El=ge('acPass2');
   var pass=passEl?passEl.value:'',pass2=pass2El?pass2El.value:'';
   if(!contact){alert('Le contact est obligatoire.');return;}
-  if(pass&&pass.length>0){
-    if(pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
-    if(pass.length<6){alert('Mot de passe trop court (6 caractères minimum).');return;}
-    sb.auth.updateUser({password:pass});
-  }
+  if(pass&&pass!==pass2){alert('Les mots de passe ne correspondent pas.');return;}
+  if(pass&&pass.length<6){alert('Mot de passe trop court.');return;}
+  if(pass)sb.auth.updateUser({password:pass});
   var linkedin=val('acLinkedin'),website=val('acWebsite');
   var eu={name:societe,contact:contact,sector:sector,description:desc,activity_description:desc};
   if(linkedin)eu.linkedin_url=linkedin;
   if(website)eu.website_url=website;
-
   var tbl=state.role==='partner'?'partners':'startups';
   var entity=state.role==='partner'?state.partner:state.startup;
-
   sb.from('profiles').update({contact:contact,name:societe,sector:sector}).eq('id',state.user.id);
-
   function doUpdate(logoUrl){
     if(logoUrl)eu.logo_url=logoUrl;
     if(entity&&entity.id){
       sb.from(tbl).update(eu).eq('id',entity.id).then(function(r){
         if(r.error){alert('❌ Erreur : '+r.error.message);return;}
-        if(state.role==='partner'){state.partner=Object.assign({},state.partner,eu);}
-        else{state.startup=Object.assign({},state.startup,eu);}
+        if(state.role==='partner')state.partner=Object.assign({},state.partner,eu);
+        else state.startup=Object.assign({},state.startup,eu);
         state.profile=Object.assign({},state.profile,{contact:contact,name:societe,sector:sector});
-        ge('userLabel').textContent=societe||state.user.email;
+        var lbl=ge('userLabel');if(lbl)lbl.textContent=societe||state.user.email;
         alert('✅ Compte mis à jour !');
       });
-    } else {alert('❌ Entité introuvable.');}
+    }
   }
-
-  // Upload logo si fichier sélectionné
-  var fileInput=ge('acLogo');
-  var file=fileInput&&fileInput.files&&fileInput.files.length>0?fileInput.files[0]:null;
+  var file=ge('acLogo')&&ge('acLogo').files&&ge('acLogo').files.length>0?ge('acLogo').files[0]:null;
   if(file){
-    var cleanName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    var path='logo_'+Date.now()+'_'+cleanName;
-    sb.storage.from('logos').upload(path,file,{upsert:true}).then(function(r){
-      if(r.error){
-        console.error('Logo upload error:',r.error.message);
-        doUpdate(null);
-      } else {
-        doUpdate(SB_URL+'/storage/v1/object/public/logos/'+path);
-      }
-    });
-  } else {
-    doUpdate(null);
-  }
+    var path='logo_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    sb.storage.from('logos').upload(path,file,{upsert:true}).then(function(r){doUpdate(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});
+  } else {doUpdate(null);}
 }
 
 function showRgpd(){
@@ -702,20 +565,15 @@ function showRgpd(){
     '<p style="margin-bottom:10px;"><strong>Données collectées :</strong> Nom, prénom, email, société, secteur, description, logo, pitch deck.</p>'+
     '<p style="margin-bottom:10px;"><strong>Finalité :</strong> Organisation des RDV B2B Matchmaking 2026.</p>'+
     '<p style="margin-bottom:10px;"><strong>Durée :</strong> 6 mois après l\'événement.</p>'+
-    '<p style="margin-bottom:10px;"><strong>Vos droits :</strong> Accès, rectification, suppression via <a href="mailto:contact@lafrenchtech-paris-saclay.fr" style="color:var(--red);">contact@lafrenchtech-paris-saclay.fr</a></p>'+
-    '</div>'+
-    '<button class="btn btn-primary" onclick="closeModal()" style="margin-top:14px;width:100%;">J\'ai compris</button>');
+    '<p style="margin-bottom:10px;"><strong>Vos droits :</strong> <a href="mailto:contact@lafrenchtech-paris-saclay.fr" style="color:var(--red);">contact@lafrenchtech-paris-saclay.fr</a></p>'+
+    '</div><button class="btn btn-primary" onclick="closeModal()" style="margin-top:14px;width:100%;">J\'ai compris</button>');
 }
 
 function deleteMyAccount(){
   if(!confirm('⚠️ Supprimer votre compte ? Action irréversible.'))return;
   var uid=state.user.id;
-  var entity=state.role==='partner'?state.partner:state.startup;
   var memberTbl=state.role==='partner'?'partner_members':'startup_members';
-  Promise.all([
-    sb.from(memberTbl).delete().eq('profile_id',uid),
-    sb.from('profiles').delete().eq('id',uid)
-  ]).then(function(){
+  Promise.all([sb.from(memberTbl).delete().eq('profile_id',uid),sb.from('profiles').delete().eq('id',uid)]).then(function(){
     sb.auth.signOut().then(function(){alert('✅ Compte supprimé.');showPage('login');showLogin();});
   });
 }
@@ -723,16 +581,12 @@ function deleteMyAccount(){
 // === PARTNERS ===
 function pgPartners(el){
   spinEl(el);
-  sb.from('partners').select('*').order('name').then(function(res){
-    allPartners=res.data||[];buildPartners(el,allPartners,'Tous');
-  });
+  sb.from('partners').select('*').order('name').then(function(res){allPartners=res.data||[];buildPartners(el,allPartners,'Tous');});
 }
 
 function buildPartners(el,partners,activeFilter){
   var sectors=['Tous'].concat(PSECTORS);
-  var filterBar='<div class="filter-bar">'+sectors.map(function(s){
-    return '<button class="filter-btn'+(s===activeFilter?' active':'')+'" onclick="filterPartners(\''+s+'\')">'+s+'</button>';
-  }).join('')+'</div>';
+  var filterBar='<div class="filter-bar">'+sectors.map(function(s){return '<button class="filter-btn'+(s===activeFilter?' active':'')+'" onclick="filterPartners(\''+s+'\')">'+s+'</button>';}).join('')+'</div>';
   var adminForm=state.role==='admin'?'<div class="card"><h2>Ajouter un partenaire</h2>'+
     '<div class="grid2"><div class="form-group"><label>Société</label><input id="pName"/></div>'+
     '<div class="form-group"><label>Secteur</label><select id="pSector">'+PSECTORS.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
@@ -743,7 +597,7 @@ function buildPartners(el,partners,activeFilter){
     '<div class="form-group"><label><input type="checkbox" id="pIsVc" style="width:auto;margin-right:6px;"/> Espace VC\'s</label></div>'+
     '<button class="btn btn-primary" onclick="addPartner()">Ajouter</button></div>':'';
   el.innerHTML='<h1>'+(state.role==='admin'?'Gestion des partenaires':'Prendre un RDV')+'</h1>'+
-    '<div class="subtitle">'+(state.role==='startup'?'Filtrez et réservez votre créneau':'Gérez les partenaires')+'</div>'+
+    '<div class="subtitle">'+(state.role==='startup'?'Filtrez et réservez votre créneau':'')+'</div>'+
     adminForm+filterBar+
     partners.map(function(p){
       var pj=encodeURIComponent(JSON.stringify({id:p.id,name:p.name,sector:p.sector||'',contact:p.contact||'',email:p.email||'',is_vc:!!p.is_vc,logo_url:p.logo_url||'',description:p.description||''}));
@@ -765,8 +619,7 @@ function buildPartners(el,partners,activeFilter){
 
 function filterPartners(sector){
   var filtered=sector==='Tous'?allPartners:allPartners.filter(function(p){return p.sector===sector;});
-  var el=document.querySelector('[data-page="partners"]');
-  if(el){buildPartners(el,filtered,sector);}
+  var el=document.querySelector('[data-page="partners"]');if(el)buildPartners(el,filtered,sector);
 }
 
 function editPartner(pJson){
@@ -784,36 +637,23 @@ function editPartner(pJson){
 }
 
 function savePartner(id){
-  var u={name:val('eName'),sector:val('eSector'),contact:val('eContact'),email:val('eEmail'),description:val('eDesc'),is_vc:!!(ge('eIsVc')&&ge('eIsVc').checked)};
-  sb.from('partners').update(u).eq('id',id).then(function(){closeModal();navigateTo('partners');});
+  sb.from('partners').update({name:val('eName'),sector:val('eSector'),contact:val('eContact'),email:val('eEmail'),description:val('eDesc'),is_vc:!!(ge('eIsVc')&&ge('eIsVc').checked)}).eq('id',id).then(function(){closeModal();navigateTo('partners');});
 }
-
 function deletePartner(id){
   if(!confirm('Supprimer ce partenaire ?'))return;
-  sb.from('slots').delete().eq('partner_id',id).then(function(){
-    sb.from('partner_members').delete().eq('partner_id',id).then(function(){
-      sb.from('partners').delete().eq('id',id).then(function(){closeModal();navigateTo('partners');});
-    });
-  });
+  sb.from('slots').delete().eq('partner_id',id).then(function(){sb.from('partner_members').delete().eq('partner_id',id).then(function(){sb.from('partners').delete().eq('id',id).then(function(){closeModal();navigateTo('partners');});});});
 }
-
 function addPartner(){
-  var isVc=!!(ge('pIsVc')&&ge('pIsVc').checked);
   var file=ge('pLogo')&&ge('pLogo').files&&ge('pLogo').files[0];
+  var isVc=!!(ge('pIsVc')&&ge('pIsVc').checked);
   function ins(logoUrl){
-    sb.from('partners').insert({name:val('pName'),sector:val('pSector'),contact:val('pContact'),email:val('pEmail'),description:val('pDesc'),is_vc:isVc,logo_url:logoUrl||null}).select().single().then(function(r){
-      if(r.data){initSlots(r.data.id);}navigateTo('partners');
-    });
+    sb.from('partners').insert({name:val('pName'),sector:val('pSector'),contact:val('pContact'),email:val('pEmail'),description:val('pDesc'),is_vc:isVc,logo_url:logoUrl||null}).select().single().then(function(r){if(r.data)initSlots(r.data.id);navigateTo('partners');});
   }
-  if(file){var path='p_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');sb.storage.from('logos').upload(path,file).then(function(r){ins(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});}
-  else{ins(null);}
+  if(file){var path='p_'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');sb.storage.from('logos').upload(path,file,{upsert:true}).then(function(r){ins(r.error?null:SB_URL+'/storage/v1/object/public/logos/'+path);});}
+  else ins(null);
 }
-
 function toggleVC(id,cur){sb.from('partners').update({is_vc:!cur}).eq('id',id).then(function(){navigateTo('partners');});}
-function blockSlots(id){
-  if(!confirm('Bloquer tous les créneaux libres ?'))return;
-  sb.from('slots').update({status:'unavailable'}).eq('partner_id',id).eq('status','free').then(function(){navigateTo('partners');});
-}
+function blockSlots(id){if(!confirm('Bloquer tous les créneaux libres ?'))return;sb.from('slots').update({status:'unavailable'}).eq('partner_id',id).eq('status','free').then(function(){navigateTo('partners');});}
 
 // === BOOKING ===
 function openBooking(partnerId,partnerName,isVC){
@@ -829,20 +669,12 @@ function openBooking(partnerId,partnerName,isVC){
   sb.from('slots').select('*').eq('partner_id',partnerId).order('time').then(function(res){
     var slots=res.data||[],myTimes=[],confTimes=[];
     if(state.startup){
-      Promise.all([
-        sb.from('slots').select('time').eq('startup_id',state.startup.id).in('status',['booked','pending']),
-        sb.from('conf_registrations').select('conferences(time,duration_min)').eq('startup_id',state.startup.id)
-      ]).then(function(r){
+      Promise.all([sb.from('slots').select('time').eq('startup_id',state.startup.id).in('status',['booked','pending']),sb.from('conf_registrations').select('conferences(time,duration_min)').eq('startup_id',state.startup.id)]).then(function(r){
         myTimes=(r[0].data||[]).map(function(s){return s.time;});
-        (r[1].data||[]).forEach(function(cr){
-          var c=cr.conferences;if(!c)return;
-          var start=parseInt(c.time.split(':')[0])*60+parseInt(c.time.split(':')[1]);
-          var end=start+(c.duration_min||30);
-          TIMES.forEach(function(t){var tmin=parseInt(t.split(':')[0])*60+parseInt(t.split(':')[1]);if(tmin>=start&&tmin<end){confTimes.push(t);}});
-        });
+        (r[1].data||[]).forEach(function(cr){var c=cr.conferences;if(!c)return;var start=parseInt(c.time.split(':')[0])*60+parseInt(c.time.split(':')[1]),end=start+(c.duration_min||30);TIMES.forEach(function(t){var tmin=parseInt(t.split(':')[0])*60+parseInt(t.split(':')[1]);if(tmin>=start&&tmin<end)confTimes.push(t);});});
         renderSlots(box,slots,myTimes,confTimes,partnerName,isVC);
       });
-    } else {renderSlots(box,slots,myTimes,confTimes,partnerName,isVC);}
+    } else renderSlots(box,slots,myTimes,confTimes,partnerName,isVC);
   });
 }
 
@@ -852,26 +684,22 @@ function renderSlots(box,slots,myTimes,confTimes,partnerName,isVC){
     var cls,lbl,clickFn='';
     if(myTimes.indexOf(sl.time)>=0){cls='mine';lbl='Mon RDV';}
     else if(sl.status==='booked'||sl.status==='pending'||sl.status==='unavailable'){cls='unavailable';lbl='Indispo';}
-    else if(confTimes.indexOf(sl.time)>=0){cls='conflict';lbl='⚠️ Conf';clickFn='bookWithWarn(\''+sl.id+'\',\''+sl.time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')';}
+    else if(confTimes.indexOf(sl.time)>=0){cls='free';lbl='⚠️ Conf';clickFn='bookWithWarn(\''+sl.id+'\',\''+sl.time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')';}
     else{cls='free';lbl='Libre';clickFn='openBookForm(\''+sl.id+'\',\''+sl.time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')';}
-    var canClick=(cls==='free'||cls==='conflict')&&state.role==='startup';
-    return '<div class="slot '+(canClick?'free':cls)+'" '+(canClick?'onclick="'+clickFn+'"':'')+'>'+
+    var canClick=cls==='free'&&state.role==='startup';
+    return '<div class="slot '+cls+'" '+(canClick?'onclick="'+clickFn+'"':'')+'>'+
       '<div style="font-size:.7rem;font-weight:700;">'+sl.time+'</div><div class="slot-name">'+lbl+'</div></div>';
   }).join('')||'<p style="color:var(--muted);font-size:.83rem;grid-column:1/-1;padding:10px;">Aucun créneau.</p>';
 }
 
-function bookWithWarn(slotId,time,partnerName,isVC){
-  if(!confirm('⚠️ Conférence à '+time+'. Prendre quand même ?'))return;
-  openBookForm(slotId,time,partnerName,isVC);
-}
+function bookWithWarn(slotId,time,partnerName,isVC){if(!confirm('⚠️ Conférence à '+time+'. Prendre quand même ?'))return;openBookForm(slotId,time,partnerName,isVC);}
 
 function openBookForm(slotId,time,partnerName,isVC){
   closeModal();
   showModal('<h2>📅 RDV avec '+partnerName+'</h2>'+
     '<div style="font-size:.83rem;color:var(--muted);margin-bottom:14px;">Créneau : <strong>'+time+'</strong></div>'+
     '<div class="form-group"><label>Commentaire</label><textarea id="bookComment" rows="3" placeholder="Présentez votre projet..."></textarea></div>'+
-    '<div class="form-group"><label>Pitch deck '+(isVC?'<span style="color:var(--red);">*obligatoire</span>':'(facultatif)')+'</label>'+
-    '<input type="file" id="bookPitch" accept=".pdf,.ppt,.pptx"/></div>'+
+    '<div class="form-group"><label>Pitch deck '+(isVC?'<span style="color:var(--red);">*obligatoire</span>':'(facultatif)')+'</label><input type="file" id="bookPitch" accept=".pdf,.ppt,.pptx"/></div>'+
     '<div class="btn-group"><button class="btn btn-primary" onclick="confirmBooking(\''+slotId+'\',\''+time+'\',\''+partnerName.replace(/'/g,"\\'")+'\','+isVC+')">Confirmer →</button>'+
     '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
@@ -882,23 +710,17 @@ function confirmBooking(slotId,time,partnerName,isVC){
   if(isVC&&!file){alert('Le pitch deck est obligatoire.');return;}
   if(file){
     var path=state.startup.id+'/'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    sb.storage.from('pitchdecks').upload(path,file).then(function(r){
-      if(r.error){alert('Erreur upload.');return;}
-      sb.storage.from('pitchdecks').createSignedUrl(path,86400*30).then(function(sr){doBooking(slotId,comment,sr.data&&sr.data.signedUrl);});
-    });
-  } else {doBooking(slotId,comment,null);}
+    sb.storage.from('pitchdecks').upload(path,file).then(function(r){if(r.error){alert('Erreur upload.');return;}sb.storage.from('pitchdecks').createSignedUrl(path,86400*30).then(function(sr){doBooking(slotId,comment,sr.data&&sr.data.signedUrl);});});
+  } else doBooking(slotId,comment,null);
 }
 
 function doBooking(slotId,comment,pitchUrl){
   var update={status:'pending',startup_id:state.startup.id,comment:comment||null};
-  if(pitchUrl){update.pitch_deck_url=pitchUrl;}
-  sb.from('slots').update(update).eq('id',slotId).eq('status','free').then(function(r){
-    if(r.error){alert('Ce créneau vient d\'être pris.');return;}
-    closeModal();alert('⏳ Demande envoyée !');
-  });
+  if(pitchUrl)update.pitch_deck_url=pitchUrl;
+  sb.from('slots').update(update).eq('id',slotId).eq('status','free').then(function(r){if(r.error){alert('Ce créneau vient d\'être pris.');return;}closeModal();alert('⏳ Demande envoyée !');});
 }
 
-// === MY RDV (Partner) ===
+// === MY RDV PARTNER ===
 function pgMyRdv(el){
   spinEl(el);
   var p=state.partner;if(!p){el.innerHTML='<p>Profil introuvable.</p>';return;}
@@ -907,9 +729,7 @@ function pgMyRdv(el){
     var booked=(res.data||[]).filter(function(s){return s.status==='booked';});
     el.innerHTML='<h1>Mes RDV — '+p.name+'</h1><div class="subtitle">Validez ou refusez les demandes</div>'+
       (pending.length?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ En attente ('+pending.length+')</h2>'+
-      pending.map(function(s){
-        var su=s.startups||{};
-        var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
+      pending.map(function(s){var su=s.startups||{};var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
         return '<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
           '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">'+
           '<div><div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
@@ -920,20 +740,17 @@ function pgMyRdv(el){
           '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'partner\')">❌ Refuser</button></div></div></div>';
       }).join('')+'</div>':'<div class="card"><p style="color:var(--muted);">Aucune demande en attente.</p></div>')+
       (booked.length?'<div class="card"><h2>✅ Confirmés ('+booked.length+')</h2>'+
-      booked.map(function(s){
-        var su=s.startups||{};
-        var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
+      booked.map(function(s){var su=s.startups||{};var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
         return '<div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">'+
           '<div><div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
-          '<div style="font-size:.8rem;color:var(--muted);">👤 '+dn+' · 📧 '+(su.email||'-')+'</div></div>'+
+          '<div style="font-size:.8rem;color:var(--muted);">👤 '+dn+'</div></div>'+
           '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'partner\')">Annuler</button></div>';
       }).join('')+'</div>':'');
   });
 }
-
 function partnerValidate(id){sb.from('slots').update({status:'booked'}).eq('id',id).then(function(){alert('✅ Accepté !');navigateTo('myRdv');});}
 
-// === MY RDV (Startup) ===
+// === MY RDV STARTUP ===
 function pgMyRdvStartup(el){
   spinEl(el);
   var s=state.startup;if(!s){el.innerHTML='<p>Profil introuvable.</p>';return;}
@@ -941,8 +758,7 @@ function pgMyRdvStartup(el){
     var slots=res.data||[];
     el.innerHTML='<h1>Mes RDV — '+s.name+'</h1><div class="subtitle">Vos RDV en cours</div>'+
       (slots.length?slots.map(function(sl){
-        var p=sl.partners||{};
-        var isPending=sl.status==='pending';
+        var p=sl.partners||{};var isPending=sl.status==='pending';
         return '<div class="card" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">'+
           '<div style="display:flex;gap:10px;">'+
           (p.logo_url?'<img src="'+p.logo_url+'" class="partner-logo"/>':'<div class="partner-logo" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🏢</div>')+
@@ -953,26 +769,21 @@ function pgMyRdvStartup(el){
       }).join(''):'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun RDV.</p></div>');
   });
 }
-
 function cancelStartup(slotId){
   showModal('<h2>Annuler ce RDV</h2>'+
     '<div class="form-group"><label>Motif *</label><textarea id="cancelComment" rows="3"></textarea></div>'+
-    '<div class="btn-group"><button class="btn btn-primary" onclick="doCancel(\''+slotId+'\')">Confirmer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Retour</button></div>');
+    '<div class="btn-group"><button class="btn btn-primary" onclick="doCancel(\''+slotId+'\')">Confirmer</button><button class="btn btn-outline" onclick="closeModal()">Retour</button></div>');
 }
-
 function doCancel(slotId){
   var comment=val('cancelComment');if(!comment){alert('Le motif est obligatoire.');return;}
-  sb.from('slots').update({status:'free',startup_id:null,cancellation_comment:comment,comment:null,pitch_deck_url:null,cancelled_by:'startup'}).eq('id',slotId).then(function(){
-    closeModal();alert('RDV annulé.');navigateTo('myRdvStartup');
-  });
+  sb.from('slots').update({status:'free',startup_id:null,cancellation_comment:comment,comment:null,pitch_deck_url:null,cancelled_by:'startup'}).eq('id',slotId).then(function(){closeModal();alert('RDV annulé.');navigateTo('myRdvStartup');});
 }
 
 // === STARTUPS ===
 function pgStartups(el){
   spinEl(el);
   sb.from('startups').select('*').order('name').then(function(res){
-    el.innerHTML='<h1>Start-up inscrites</h1><div class="subtitle">Liste</div>'+
+    el.innerHTML='<h1>Start-up inscrites</h1>'+
     (res.data||[]).map(function(s){
       var sj=encodeURIComponent(JSON.stringify({id:s.id,name:s.name,sector:s.sector||'',contact:s.contact||'',email:s.email||''}));
       return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">'+
@@ -982,7 +793,6 @@ function pgStartups(el){
     }).join('');
   });
 }
-
 function editStartup(sJson){
   var s=typeof sJson==='string'?JSON.parse(sJson):sJson;
   showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>✏️ '+s.name+'</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
@@ -990,20 +800,14 @@ function editStartup(sJson){
     '<div class="form-group"><label>Secteur</label><select id="esSector">'+SSECTORS.map(function(sec){return '<option'+(sec===s.sector?' selected':'')+'>'+sec+'</option>';}).join('')+'</select></div>'+
     '<div class="form-group"><label>Contact</label><input id="esContact" value="'+s.contact+'"/></div>'+
     '<div class="form-group"><label>Email</label><input id="esEmail" type="email" value="'+s.email+'"/></div>'+
-    '<div class="btn-group"><button class="btn btn-primary" onclick="saveStartup(\''+s.id+'\')">💾 Enregistrer</button>'+
+    '<div class="btn-group"><button class="btn btn-primary" onclick="saveStartup(\''+s.id+'\')">💾</button>'+
     '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteStartup(\''+s.id+'\')">🗑</button>'+
     '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
-
 function saveStartup(id){sb.from('startups').update({name:val('esName'),sector:val('esSector'),contact:val('esContact'),email:val('esEmail')}).eq('id',id).then(function(){closeModal();navigateTo('startups');});}
-
 function deleteStartup(id){
   if(!confirm('Supprimer ?'))return;
-  sb.from('conf_registrations').delete().eq('startup_id',id).then(function(){
-    sb.from('startup_members').delete().eq('startup_id',id).then(function(){
-      sb.from('startups').delete().eq('id',id).then(function(){closeModal();navigateTo('startups');});
-    });
-  });
+  sb.from('conf_registrations').delete().eq('startup_id',id).then(function(){sb.from('startup_members').delete().eq('startup_id',id).then(function(){sb.from('startups').delete().eq('id',id).then(function(){closeModal();navigateTo('startups');});});});
 }
 
 // === CONFERENCES ===
@@ -1019,7 +823,7 @@ function pgConferences(el){
     var myConfIds=(r[1].data||[]).map(function(x){return x.conference_id;});
     var myRdvTimes=(r[2].data||[]).map(function(x){return x.time;});
     var regsByConf={};
-    (r[3].data||[]).forEach(function(x){if(!regsByConf[x.conference_id]){regsByConf[x.conference_id]=[];}if(x.startups){regsByConf[x.conference_id].push(x.startups);}});
+    (r[3].data||[]).forEach(function(x){if(!regsByConf[x.conference_id])regsByConf[x.conference_id]=[];if(x.startups)regsByConf[x.conference_id].push(x.startups);});
     var form=state.role==='admin'?'<div class="card"><h2>Ajouter une conférence</h2>'+
       '<div class="grid2"><div class="form-group"><label>Titre</label><input id="cTitle"/></div>'+
       '<div class="form-group"><label>Heure</label><input id="cTime" placeholder="14:00"/></div>'+
@@ -1032,14 +836,10 @@ function pgConferences(el){
     confs.map(function(c){
       var isReg=myConfIds.indexOf(c.id)>=0;
       var conflict=false;
-      if(myRdvTimes.length){
-        var cstart=parseInt(c.time.split(':')[0])*60+parseInt(c.time.split(':')[1]);
-        var cend=cstart+(c.duration_min||30);
-        myRdvTimes.forEach(function(t){var tmin=parseInt(t.split(':')[0])*60+parseInt(t.split(':')[1]);if(tmin>=cstart&&tmin<cend){conflict=true;}});
-      }
+      if(myRdvTimes.length){var cs=parseInt(c.time.split(':')[0])*60+parseInt(c.time.split(':')[1]),ce=cs+(c.duration_min||30);myRdvTimes.forEach(function(t){var tm=parseInt(t.split(':')[0])*60+parseInt(t.split(':')[1]);if(tm>=cs&&tm<ce)conflict=true;});}
       var cj=encodeURIComponent(JSON.stringify({id:c.id,title:c.title,time:c.time,duration_min:c.duration_min,salle:c.salle||'',speaker:c.speaker||'',description:c.description||''}));
       var regs=regsByConf[c.id]||[];
-      var regsHtml=state.role==='admin'&&regs.length?'<div style="margin-top:8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:.78rem;"><div style="font-weight:600;margin-bottom:4px;">👥 Inscrits ('+regs.length+') :</div>'+regs.map(function(s){return '<div>'+s.contact+' — '+s.name+'</div>';}).join('')+'</div>':'';
+      var regsHtml=state.role==='admin'&&regs.length?'<div style="margin-top:8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:.78rem;"><strong>👥 Inscrits ('+regs.length+') :</strong><br>'+regs.map(function(s){return s.contact+' — '+s.name;}).join('<br>')+'</div>':'';
       var btns=state.role==='admin'?
         '<button class="btn btn-sm" style="background:#f0f0f0;" onclick="editConf(decodeURIComponent(\''+cj+'\'))">✏️</button> <button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteConf(\''+c.id+'\')">🗑</button>':
         isReg?'<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="unregConf(\''+c.id+'\')">Se désinscrire</button><span class="badge badge-green">✓ Inscrit(e)</span>':
@@ -1054,39 +854,22 @@ function pgConferences(el){
     }).join('');
   });
 }
-
 function addConf(){sb.from('conferences').insert({title:val('cTitle'),time:val('cTime'),duration_min:parseInt(val('cDur'))||30,salle:val('cSalle'),speaker:val('cSpeaker'),description:val('cDesc')}).then(function(){navigateTo('conferences');});}
-
 function editConf(cJson){
   var c=typeof cJson==='string'?JSON.parse(cJson):cJson;
   showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>✏️ Conférence</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
     '<div class="form-group"><label>Titre</label><input id="ecTitle" value="'+c.title+'"/></div>'+
     '<div class="grid2"><div class="form-group"><label>Heure</label><input id="ecTime" value="'+c.time+'"/></div>'+
-    '<div class="form-group"><label>Durée (min)</label><input id="ecDur" type="number" value="'+c.duration_min+'"/></div></div>'+
+    '<div class="form-group"><label>Durée</label><input id="ecDur" type="number" value="'+c.duration_min+'"/></div></div>'+
     '<div class="form-group"><label>Salle</label><input id="ecSalle" value="'+c.salle+'"/></div>'+
     '<div class="form-group"><label>Intervenant(s)</label><input id="ecSpeaker" value="'+c.speaker+'"/></div>'+
     '<div class="form-group"><label>Description</label><textarea id="ecDesc" rows="2">'+c.description+'</textarea></div>'+
-    '<div class="btn-group"><button class="btn btn-primary" onclick="saveConf(\''+c.id+'\')">💾 Enregistrer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
+    '<div class="btn-group"><button class="btn btn-primary" onclick="saveConf(\''+c.id+'\')">💾</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
-
 function saveConf(id){sb.from('conferences').update({title:val('ecTitle'),time:val('ecTime'),duration_min:parseInt(val('ecDur'))||30,salle:val('ecSalle'),speaker:val('ecSpeaker'),description:val('ecDesc')}).eq('id',id).then(function(){closeModal();navigateTo('conferences');});}
-
-function deleteConf(id){
-  if(!confirm('Supprimer ?'))return;
-  sb.from('conf_registrations').delete().eq('conference_id',id).then(function(){sb.from('conferences').delete().eq('id',id).then(function(){navigateTo('conferences');});});
-}
-
-function regConf(cid,hasConflict){
-  if(hasConflict&&!confirm('⚠️ RDV à ce créneau. S\'inscrire quand même ?'))return;
-  if(!state.startup){alert('Connectez-vous en tant que start-up.');return;}
-  sb.from('conf_registrations').insert({conference_id:cid,startup_id:state.startup.id}).then(function(){navigateTo('conferences');});
-}
-
-function unregConf(cid){
-  if(!state.startup)return;
-  sb.from('conf_registrations').delete().eq('conference_id',cid).eq('startup_id',state.startup.id).then(function(){navigateTo('conferences');});
-}
+function deleteConf(id){if(!confirm('Supprimer ?'))return;sb.from('conf_registrations').delete().eq('conference_id',id).then(function(){sb.from('conferences').delete().eq('id',id).then(function(){navigateTo('conferences');});});}
+function regConf(cid,hasConflict){if(hasConflict&&!confirm('⚠️ RDV à ce créneau. S\'inscrire quand même ?'))return;if(!state.startup){alert('Connectez-vous en tant que start-up.');return;}sb.from('conf_registrations').insert({conference_id:cid,startup_id:state.startup.id}).then(function(){navigateTo('conferences');});}
+function unregConf(cid){if(!state.startup)return;sb.from('conf_registrations').delete().eq('conference_id',cid).eq('startup_id',state.startup.id).then(function(){navigateTo('conferences');});}
 
 // === CRASH TEST ===
 function pgCrashTest(el){
@@ -1094,7 +877,7 @@ function pgCrashTest(el){
   sb.from('crash_test_corners').select('*').order('name').then(function(rc){
     var corners=rc.data||[];
     var form=state.role==='admin'?'<div class="card"><h2>Créer un corner</h2>'+
-      '<div class="form-group"><label>Nom</label><input id="ctName" placeholder="Salle 1"/></div>'+
+      '<div class="form-group"><label>Nom</label><input id="ctName"/></div>'+
       '<div class="form-group"><label>Description</label><textarea id="ctDesc" rows="2"></textarea></div>'+
       '<div class="form-group"><label>Créneaux (HH:MM séparés par virgules)</label><input id="ctSlots" placeholder="14:00,14:30"/></div>'+
       '<button class="btn btn-primary" onclick="addCorner()">Créer</button></div>':'';
@@ -1103,15 +886,13 @@ function pgCrashTest(el){
         var cj=encodeURIComponent(JSON.stringify({id:corner.id,name:corner.name,description:corner.description||''}));
         return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'+
           '<h2 style="margin:0;">'+corner.name+'</h2>'+
-          (state.role==='admin'?'<div class="btn-group" style="margin:0;"><button class="btn btn-sm" style="background:#f0f0f0;" onclick="editCorner(decodeURIComponent(\''+cj+'\'))">✏️</button>'+
-          '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteCorner(\''+corner.id+'\')">🗑</button></div>':'')+
+          (state.role==='admin'?'<div class="btn-group" style="margin:0;"><button class="btn btn-sm" style="background:#f0f0f0;" onclick="editCorner(decodeURIComponent(\''+cj+'\'))">✏️</button><button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="deleteCorner(\''+corner.id+'\')">🗑</button></div>':'')+
           '</div>'+(corner.description?'<p style="font-size:.82rem;color:#555;margin-bottom:12px;">'+corner.description+'</p>':'')+
           '<div id="ctslots_'+corner.id+'"><div class="loading"><div class="spinner"></div></div></div></div>';
       }).join(''):'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun corner.</p></div>');
     corners.forEach(function(corner){loadCornerSlots(corner.id);});
   });
 }
-
 function loadCornerSlots(cornerId){
   var el=ge('ctslots_'+cornerId);if(!el)return;
   sb.from('crash_test_slots').select('*,startups(name,contact)').eq('corner_id',cornerId).order('time').then(function(res){
@@ -1127,50 +908,38 @@ function loadCornerSlots(cornerId){
           '<div style="font-size:.72rem;font-weight:700;">'+sl.time+'</div>'+
           '<div class="slot-name">'+(isMine?'Mon créneau':isBooked?'Réservé':'Libre')+'</div></div>';
       }).join('')+'</div>'+
-      (state.role==='admin'&&booked.length?'<div style="margin-top:12px;padding:10px;background:#f9f9f9;border-radius:8px;font-size:.78rem;"><div style="font-weight:600;margin-bottom:6px;">👥 Inscrits :</div>'+booked.map(function(s){return '<div>'+s.startups.contact+' — '+s.startups.name+' · '+s.time+'</div>';}).join('')+'</div>':'');
+      (state.role==='admin'&&booked.length?'<div style="margin-top:10px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:.78rem;"><strong>👥 Inscrits :</strong><br>'+booked.map(function(s){return s.startups.contact+' — '+s.startups.name+' · '+s.time;}).join('<br>')+'</div>':'');
   });
 }
-
 function addCorner(){
   var name=val('ctName'),desc=val('ctDesc'),slotsStr=val('ctSlots');
   if(!name){alert('Donnez un nom.');return;}
   sb.from('crash_test_corners').insert({name:name,description:desc}).select().single().then(function(r){
     if(r.error||!r.data){alert('Erreur.');return;}
     var times=slotsStr.split(',').map(function(t){return t.trim();}).filter(Boolean);
-    if(times.length){sb.from('crash_test_slots').insert(times.map(function(t){return {corner_id:r.data.id,time:t,status:'free'};})).then(function(){navigateTo('crashtest');});}
-    else{navigateTo('crashtest');}
+    if(times.length)sb.from('crash_test_slots').insert(times.map(function(t){return {corner_id:r.data.id,time:t,status:'free'};})).then(function(){navigateTo('crashtest');});
+    else navigateTo('crashtest');
   });
 }
-
 function editCorner(cJson){
   var c=typeof cJson==='string'?JSON.parse(cJson):cJson;
   showModal('<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><h2>✏️ Corner</h2><button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
     '<div class="form-group"><label>Nom</label><input id="ecName" value="'+c.name+'"/></div>'+
     '<div class="form-group"><label>Description</label><textarea id="ecDesc2" rows="2">'+c.description+'</textarea></div>'+
     '<div class="form-group"><label>Ajouter créneaux</label><input id="ecSlots" placeholder="16:00,16:30"/></div>'+
-    '<div class="btn-group"><button class="btn btn-primary" onclick="saveCorner(\''+c.id+'\')">💾 Enregistrer</button>'+
-    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
+    '<div class="btn-group"><button class="btn btn-primary" onclick="saveCorner(\''+c.id+'\')">💾</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>');
 }
-
 function saveCorner(id){
-  var slotsStr=val('ecSlots');
   sb.from('crash_test_corners').update({name:val('ecName'),description:val('ecDesc2')}).eq('id',id).then(function(){
-    if(slotsStr){var rows=slotsStr.split(',').map(function(t){return {corner_id:id,time:t.trim(),status:'free'};}).filter(function(r){return r.time;});sb.from('crash_test_slots').insert(rows).then(function(){closeModal();navigateTo('crashtest');});}
+    var s=val('ecSlots');
+    if(s)sb.from('crash_test_slots').insert(s.split(',').map(function(t){return {corner_id:id,time:t.trim(),status:'free'};}).filter(function(r){return r.time;})).then(function(){closeModal();navigateTo('crashtest');});
     else{closeModal();navigateTo('crashtest');}
   });
 }
-
-function deleteCorner(id){
-  if(!confirm('Supprimer ce corner ?'))return;
-  sb.from('crash_test_slots').delete().eq('corner_id',id).then(function(){sb.from('crash_test_corners').delete().eq('id',id).then(function(){navigateTo('crashtest');});});
-}
-
+function deleteCorner(id){if(!confirm('Supprimer ?'))return;sb.from('crash_test_slots').delete().eq('corner_id',id).then(function(){sb.from('crash_test_corners').delete().eq('id',id).then(function(){navigateTo('crashtest');});});}
 function bookCrashTest(slotId,time){
   if(!confirm('Réserver à '+time+' ?'))return;
-  sb.from('crash_test_slots').update({status:'booked',startup_id:state.startup.id}).eq('id',slotId).eq('status','free').then(function(r){
-    if(r.error){alert('Créneau déjà pris.');return;}
-    alert('✅ Réservé à '+time+' !');navigateTo('crashtest');
-  });
+  sb.from('crash_test_slots').update({status:'booked',startup_id:state.startup.id}).eq('id',slotId).eq('status','free').then(function(r){if(r.error){alert('Créneau déjà pris.');return;}alert('✅ Réservé à '+time+' !');navigateTo('crashtest');});
 }
 
 // === PLANNING ===
@@ -1178,33 +947,22 @@ function pgPlanning(el){
   spinEl(el);
   sb.from('partners').select('id,name,is_vc,sector').order('name').then(function(r1){
     sb.from('slots').select('partner_id,time,status').then(function(r2){
-      var map={};
-      (r2.data||[]).forEach(function(s){if(!map[s.partner_id]){map[s.partner_id]={};}map[s.partner_id][s.time]=s.status;});
+      var map={};(r2.data||[]).forEach(function(s){if(!map[s.partner_id])map[s.partner_id]={};map[s.partner_id][s.time]=s.status;});
       var partners=r1.data||[];
-      var filterBar='<div class="filter-bar" id="pfBar">'+['Tous'].concat(PSECTORS).map(function(s){
-        return '<button class="filter-btn'+(s==='Tous'?' active':'')+'" onclick="filterPlanning(\''+s+'\')">'+s+'</button>';
-      }).join('')+'</div>';
+      var filterBar='<div class="filter-bar" id="pfBar">'+['Tous'].concat(PSECTORS).map(function(s){return '<button class="filter-btn'+(s==='Tous'?' active':'')+'" onclick="filterPlanning(\''+s+'\')">'+s+'</button>';}).join('')+'</div>';
       el.innerHTML='<h1>Planning global</h1>'+filterBar+'<div id="pfTable">'+buildPlanTable(partners,map)+'</div>';
       el._p=partners;el._m=map;
     });
   });
 }
-
 function buildPlanTable(list,map){
   return '<div style="overflow-x:auto;"><table><tr><th>Heure</th>'+list.map(function(p){return '<th>'+p.name+(p.is_vc?' 🔒':'')+'</th>';}).join('')+'</tr>'+
-    TIMES.map(function(t){return '<tr><td style="font-weight:700;color:var(--red);">'+t+'</td>'+
-      list.map(function(p){var st=map[p.id]&&map[p.id][t];
-        if(!st){return '<td>—</td>';}
-        if(st==='booked'||st==='pending'){return '<td style="color:var(--red);">✖</td>';}
-        if(st==='unavailable'){return '<td style="color:#bbb;">🔒</td>';}
-        return '<td style="color:var(--green);">✔</td>';
-      }).join('')+'</tr>';}).join('')+'</table></div>';
+    TIMES.map(function(t){return '<tr><td style="font-weight:700;color:var(--red);">'+t+'</td>'+list.map(function(p){var st=map[p.id]&&map[p.id][t];if(!st)return '<td>—</td>';if(st==='booked'||st==='pending')return '<td style="color:var(--red);">✖</td>';if(st==='unavailable')return '<td style="color:#bbb;">🔒</td>';return '<td style="color:var(--green);">✔</td>';}).join('')+'</tr>';}).join('')+'</table></div>';
 }
-
 function filterPlanning(sector){
   var el=document.querySelector('[data-page="planning"]');if(!el)return;
   document.querySelectorAll('#pfBar .filter-btn').forEach(function(b){b.classList.toggle('active',b.textContent===sector);});
-  var t=ge('pfTable');if(t){t.innerHTML=buildPlanTable(sector==='Tous'?el._p:(el._p||[]).filter(function(p){return p.sector===sector;}),el._m||{});}
+  var t=ge('pfTable');if(t)t.innerHTML=buildPlanTable(sector==='Tous'?el._p:(el._p||[]).filter(function(p){return p.sector===sector;}),el._m||{});
 }
 
 // === MY PLANNING ===
@@ -1224,13 +982,9 @@ function pgMyPlanning(el){
       }).join('')+'</div></div>';
   });
 }
-
 function toggleSlot(id,cur,el){
   var ns=cur==='free'?'unavailable':'free';
-  sb.from('slots').update({status:ns}).eq('id',id).then(function(){
-    el.className='slot '+ns;el.querySelector('.slot-name').textContent=ns==='free'?'Dispo':'Indispo';
-    el.onclick=function(){toggleSlot(id,ns,el);};
-  });
+  sb.from('slots').update({status:ns}).eq('id',id).then(function(){el.className='slot '+ns;el.querySelector('.slot-name').textContent=ns==='free'?'Dispo':'Indispo';el.onclick=function(){toggleSlot(id,ns,el);};});
 }
 
 // === MY AGENDA ===
@@ -1244,7 +998,7 @@ function pgMyAgenda(el){
   ]).then(function(r){
     var events=[];
     (r[0].data||[]).forEach(function(x){events.push({time:x.time,type:'rdv',label:(x.partners&&x.partners.name)||'-',sub:x.status==='pending'?'⏳ En attente':'✅ Confirmé'});});
-    (r[1].data||[]).forEach(function(x){var c=x.conferences;if(c){events.push({time:c.time,type:'conf',label:c.title,sub:'🎤 Conférence'});}});
+    (r[1].data||[]).forEach(function(x){var c=x.conferences;if(c)events.push({time:c.time,type:'conf',label:c.title,sub:'🎤 Conférence'});});
     (r[2].data||[]).forEach(function(x){events.push({time:x.time,type:'crash',label:(x.crash_test_corners&&x.crash_test_corners.name)||'Crash Test',sub:'🔬 Crash Test'});});
     events.sort(function(a,b){return a.time.localeCompare(b.time);});
     el.innerHTML='<h1>Mon agenda — '+s.name+'</h1>'+
@@ -1265,16 +1019,13 @@ function pgMyPDF(el){
     '<div class="card" style="text-align:center;padding:36px;"><div style="font-size:2.5rem;margin-bottom:14px;">📄</div>'+
     '<button class="btn btn-primary" onclick="generatePDF()" style="padding:11px 24px;">⬇️ Télécharger</button></div>';
 }
-
 function generatePDF(){
   var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
   var user=state.role==='partner'?state.partner:state.startup;
   if(!user){alert('Profil introuvable');return;}
   var W=210,m=15,y=45;
-  doc.setFillColor(26,26,46);doc.rect(0,0,W,35,'F');
-  doc.setFillColor(255,0,50);doc.rect(0,30,W,5,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text('FRENCH TECH PARIS-SACLAY',m,14);
+  doc.setFillColor(26,26,46);doc.rect(0,0,W,35,'F');doc.setFillColor(255,0,50);doc.rect(0,30,W,5,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont('helvetica','bold');doc.text('FRENCH TECH PARIS-SACLAY',m,14);
   doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('B2B Matchmaking 2026',m,22);
   doc.setFontSize(9);doc.text('Généré le '+new Date().toLocaleDateString('fr-FR'),W-m,22,{align:'right'});
   doc.setFillColor(244,244,247);doc.roundedRect(m,y,W-2*m,18,3,3,'F');
@@ -1287,27 +1038,21 @@ function generatePDF(){
   if(state.role==='partner'){
     sb.from('slots').select('time,startups(name,contact,email)').eq('partner_id',user.id).eq('status','booked').order('time').then(function(res){
       sec('📅 RDV Confirmés ('+(res.data||[]).length+')',26,26,46);
-      (res.data||[]).forEach(function(s,i){var su=s.startups||{};row(s.time,(su.contact||su.email||'-')+' — '+(su.name||'-'),i%2===0);});
-      footer();
+      (res.data||[]).forEach(function(s,i){var su=s.startups||{};row(s.time,(su.contact||su.email||'-')+' — '+(su.name||'-'),i%2===0);});footer();
     });
   } else {
     sb.from('slots').select('time,partners(name,contact)').eq('startup_id',user.id).eq('status','booked').order('time').then(function(r1){
       sec('📅 Mes RDV ('+(r1.data||[]).length+')',26,26,46);
-      (r1.data||[]).forEach(function(r,i){row(r.time,(r.partners?r.partners.name+' — '+(r.partners.contact||''):'-'),i%2===0);});
-      y+=4;
+      (r1.data||[]).forEach(function(r,i){row(r.time,(r.partners?r.partners.name+' — '+(r.partners.contact||''):'-'),i%2===0);});y+=4;
       sb.from('conf_registrations').select('conferences(title,time,salle)').eq('startup_id',user.id).then(function(r2){
         sec('🎤 Conférences ('+(r2.data||[]).length+')',220,0,40);
-        (r2.data||[]).forEach(function(r,i){var c=r.conferences;if(c){row(c.time,c.title+' · '+(c.salle||''),i%2===0);}});
-        footer();
+        (r2.data||[]).forEach(function(r,i){var c=r.conferences;if(c)row(c.time,c.title+' · '+(c.salle||''),i%2===0);});footer();
       });
     });
   }
 }
 
-window.addEventListener('load',function(){
-  showLogin();
-  checkSession();
-});
+window.addEventListener('load',function(){showLogin();checkSession();});
 </script>
 </body>
 </html>
