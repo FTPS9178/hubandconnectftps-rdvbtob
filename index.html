@@ -812,9 +812,13 @@ function doBooking(slotId,comment,pitchUrl){
 function pgMyRdv(el){
   spinEl(el);
   var p=state.partner;if(!p){el.innerHTML='<p>Profil introuvable.</p>';return;}
-  sb.from('slots').select('*,startups(id,name,contact,email,sector)').eq('partner_id',p.id).in('status',['pending','booked']).order('time').then(function(res){
-    var pending=(res.data||[]).filter(function(s){return s.status==='pending';});
-    var booked=(res.data||[]).filter(function(s){return s.status==='booked';});
+  Promise.all([
+    sb.from('slots').select('*,startups(id,name,contact,email,sector)').eq('partner_id',p.id).in('status',['pending','booked']).order('time'),
+    sb.from('slots').select('*,startups(name,contact)').eq('cancelled_partner_id',p.id).eq('status','free').not('cancellation_comment','is',null).order('time')
+  ]).then(function(r){
+    var pending=(r[0].data||[]).filter(function(s){return s.status==='pending';});
+    var booked=(r[0].data||[]).filter(function(s){return s.status==='booked';});
+    var cancelled=r[1].data||[];
     el.innerHTML='<h1>Mes RDV — '+p.name+'</h1><div class="subtitle">Validez ou refusez les demandes</div>'+
       (pending.length?'<div class="card" style="border-left:4px solid #ffc107;"><h2>⏳ En attente ('+pending.length+')</h2>'+
       pending.map(function(s){var su=s.startups||{};var dn=su.contact&&su.contact.trim()?su.contact:su.email||'-';
@@ -833,6 +837,16 @@ function pgMyRdv(el){
           '<div><div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
           '<div style="font-size:.8rem;color:var(--muted);">👤 '+dn+'</div></div>'+
           '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="openRefuse(\''+s.id+'\',\'partner\')">Annuler</button></div>';
+      }).join('')+'</div>':'')+
+      // ✅ RDV annulés par les startups
+      (cancelled.length?'<div class="card" style="border-left:4px solid #856404;"><h2>⚠️ Annulés par la start-up ('+cancelled.length+')</h2>'+
+      cancelled.map(function(s){
+        var su=s.startups||{};
+        return '<div style="padding:10px 0;border-bottom:1px solid var(--border);">'+
+          '<div style="font-weight:700;">'+s.time+' — '+(su.name||'-')+'</div>'+
+          '<div style="font-size:.8rem;color:var(--muted);">👤 '+(su.contact||'-')+'</div>'+
+          (s.cancellation_comment?'<div style="font-size:.8rem;color:#856404;margin-top:4px;">💬 Motif : '+s.cancellation_comment+'</div>':'')+
+          '</div>';
       }).join('')+'</div>':'');
   });
 }
@@ -1143,7 +1157,7 @@ function generatePDF(){
   function footer(){doc.setFillColor(26,26,46);doc.rect(0,285,W,12,'F');doc.setTextColor(255,255,255);doc.setFontSize(8);doc.text('La French Tech Paris-Saclay · B2B Matchmaking 2026',m,292);doc.save('programme_'+user.name.replace(/\s+/g,'_')+'.pdf');}
   if(state.role==='partner'){
     sb.from('slots').select('time,startups(name,contact,email)').eq('partner_id',user.id).eq('status','booked').order('time').then(function(res){
-      sec('📅 RDV Confirmés ('+(res.data||[]).length+')',26,26,46);
+      sec('RDV Confirmes ('+(res.data||[]).length+')',26,26,46);
       (res.data||[]).forEach(function(s,i){var su=s.startups||{};row(s.time,(su.contact||su.email||'-')+' — '+(su.name||'-'),i%2===0);});footer();
     });
   } else {
