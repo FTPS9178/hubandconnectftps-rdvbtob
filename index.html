@@ -286,8 +286,10 @@ function doRegister(role){
     function doCreate(logoUrl){
       sb.auth.signUp({email:email,password:pass}).then(function(res){
         if(res.error){setMsg('❌ '+res.error.message,'error');return;}
-        var uid=res.data.user.id;
-        sb.from('profiles').insert({id:uid,role:role,name:existingId?'':societe,sector:existingId?'':secteur,contact:contact,description:desc}).then(function(){
+        var uid=res.data&&res.data.user&&res.data.user.id;
+        if(!uid){setMsg('❌ Erreur création compte. Vérifiez votre email.','error');return;}
+        sb.from('profiles').insert({id:uid,role:role,name:existingId?'':societe,sector:existingId?'':secteur,contact:contact,description:desc}).then(function(rp){
+          if(rp.error){console.error('profiles error:',rp.error);return;}
           if(existingId){
             var mt=role==='partner'?'partner_members':'startup_members';
             var col=role==='partner'?'partner_id':'startup_id';
@@ -301,11 +303,14 @@ function doRegister(role){
             if(website)data.website_url=website;
             if(logoUrl)data.logo_url=logoUrl;
             sb.from(tbl).insert(data).select().single().then(function(r){
+              if(r.error){console.error('entity error:',r.error);return;}
               if(r.data){
                 var mt=role==='partner'?'partner_members':'startup_members';
                 var col=role==='partner'?'partner_id':'startup_id';
                 var obj={profile_id:uid};obj[col]=r.data.id;
-                sb.from(mt).insert(obj);
+                sb.from(mt).insert(obj).then(function(rm){
+                  if(rm.error)console.error('members error:',rm.error);
+                });
               }
             });
           }
@@ -616,7 +621,7 @@ function buildPartners(el,partners,activeFilter){
         (p.logo_url?'<img src="'+p.logo_url+'" class="partner-logo"/>':'<div class="partner-logo" style="display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🏢</div>')+
         '<div style="flex:1;min-width:0;">'+
         '<div style="font-weight:700;">'+p.name+' <span class="badge badge-red">'+(p.sector||'')+'</span>'+(p.is_vc?'<span class="badge badge-vc">🔒 VC\'s</span>':'')+'</div>'+
-        '<div style="font-size:.8rem;color:var(--muted);">'+(p.contact||'')+' · '+(p.email||'')+'</div>'+
+        '<div style="font-size:.8rem;color:var(--muted);">'+(p.contact||'')+(state.role==='admin'?' · '+(p.email||''):'')+'</div>'+
         (p.description?'<div style="font-size:.8rem;color:#555;margin-top:4px;">'+p.description+'</div>':'')+
         '<div class="btn-group">'+
         (state.role==='startup'?'<button class="btn btn-primary btn-sm" onclick="openBooking(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\','+!!p.is_vc+')">Prendre RDV →</button>':'')+
@@ -663,7 +668,51 @@ function addPartner(){
   else ins(null);
 }
 function toggleVC(id,cur){sb.from('partners').update({is_vc:!cur}).eq('id',id).then(function(){navigateTo('partners');});}
-function blockSlots(id){if(!confirm('Bloquer tous les créneaux libres ?'))return;sb.from('slots').update({status:'unavailable'}).eq('partner_id',id).eq('status','free').then(function(){navigateTo('partners');});}
+function blockSlots(partnerId){
+  spinEl(document.querySelector('[data-page]'));
+  sb.from('slots').select('*').eq('partner_id',partnerId).order('time').then(function(res){
+    var slots=res.data||[];
+    showModal(
+      '<div style="display:flex;justify-content:space-between;margin-bottom:14px;">'+
+      '<h2>🔒 Gérer les créneaux</h2>'+
+      '<button onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;">✕</button></div>'+
+      '<p style="font-size:.83rem;color:var(--muted);margin-bottom:14px;">Cliquez sur un créneau pour le bloquer ou le débloquer.</p>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;">'+
+      slots.map(function(sl){
+        var isFree=sl.status==='free';
+        var isUnavail=sl.status==='unavailable';
+        var isBooked=sl.status==='booked'||sl.status==='pending';
+        var bg=isFree?'#e8f8f2':isUnavail?'#ffe0e6':'#f0f0f0';
+        var color=isFree?'#1a7a5a':isUnavail?'var(--red)':'#bbb';
+        var label=isFree?'✅ Libre':isUnavail?'🔒 Bloqué':'📅 Réservé';
+        var canToggle=isFree||isUnavail;
+        return '<div onclick="'+(canToggle?'toggleAdminSlot(\''+sl.id+'\',\''+sl.status+'\')':'')+'" '+
+          'style="padding:10px;border-radius:8px;text-align:center;cursor:'+(canToggle?'pointer':'not-allowed')+';background:'+bg+';color:'+color+';border:1.5px solid '+color+';">'+
+          '<div style="font-weight:700;font-size:.85rem;">'+sl.time+'</div>'+
+          '<div style="font-size:.72rem;margin-top:3px;">'+label+'</div>'+
+          (sl.refusal_comment?'<div style="font-size:.65rem;margin-top:3px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+sl.refusal_comment+'">'+sl.refusal_comment+'</div>':'')+'</div>';
+      }).join('')+
+      '</div>'
+    );
+  });
+}
+
+function toggleAdminSlot(slotId,currentStatus){
+  if(currentStatus==='free'){
+    // Bloquer avec motif
+    var motif=prompt('Motif du blocage (obligatoire) :');
+    if(!motif)return;
+    sb.from('slots').update({status:'unavailable',refusal_comment:motif}).eq('id',slotId).then(function(){
+      closeModal();navigateTo('partners');
+    });
+  } else if(currentStatus==='unavailable'){
+    // Débloquer
+    if(!confirm('Débloquer ce créneau ?'))return;
+    sb.from('slots').update({status:'free',refusal_comment:null}).eq('id',slotId).then(function(){
+      closeModal();navigateTo('partners');
+    });
+  }
+}
 
 // === BOOKING ===
 function openBooking(partnerId,partnerName,isVC){
@@ -764,8 +813,12 @@ function partnerValidate(id){sb.from('slots').update({status:'booked'}).eq('id',
 function pgMyRdvStartup(el){
   spinEl(el);
   var s=state.startup;if(!s){el.innerHTML='<p>Profil introuvable.</p>';return;}
-  sb.from('slots').select('*,partners(name,contact,sector,description,logo_url,is_vc)').eq('startup_id',s.id).in('status',['pending','booked']).order('time').then(function(res){
-    var slots=res.data||[];
+  Promise.all([
+    sb.from('slots').select('*,partners(name,contact,sector,description,logo_url,is_vc)').eq('startup_id',s.id).in('status',['pending','booked']).order('time'),
+    sb.from('slots').select('*,partners(name,logo_url)').eq('startup_id',s.id).eq('status','free').not('refusal_comment','is',null).order('time')
+  ]).then(function(r){
+    var slots=r[0].data||[];
+    var refused=r[1].data||[];
     el.innerHTML='<h1>Mes RDV — '+s.name+'</h1><div class="subtitle">Vos RDV en cours</div>'+
       (slots.length?slots.map(function(sl){
         var p=sl.partners||{};var isPending=sl.status==='pending';
@@ -776,7 +829,18 @@ function pgMyRdvStartup(el){
           '<div style="font-size:.8rem;color:var(--muted);">'+(p.contact||'')+' · '+(p.sector||'')+'</div>'+
           '<div style="margin-top:4px;"><span style="font-size:.76rem;padding:2px 8px;border-radius:20px;background:'+(isPending?'#fff3cd':'#d4f5ee')+';color:'+(isPending?'#856404':'var(--green)')+';">'+(isPending?'⏳ En attente':'✅ Confirmé')+'</span></div></div></div>'+
           '<button class="btn btn-sm" style="background:#fee;color:#c00;" onclick="cancelStartup(\''+sl.id+'\')">Annuler</button></div>';
-      }).join(''):'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun RDV.</p></div>');
+      }).join(''):'<div class="card"><p style="color:var(--muted);text-align:center;padding:20px;">Aucun RDV en cours.</p></div>')+
+      // RDV refusés
+      (refused.length?'<h2 style="margin:16px 0 10px;">❌ RDV refusés</h2>'+
+      refused.map(function(sl){
+        var p=sl.partners||{};
+        return '<div class="card" style="border-left:4px solid #c00;opacity:.85;">'+
+          '<div style="display:flex;gap:10px;align-items:center;">'+
+          (p.logo_url?'<img src="'+p.logo_url+'" class="partner-logo"/>':'<div class="partner-logo" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🏢</div>')+
+          '<div><div style="font-weight:700;">'+sl.time+' — '+(p.name||'-')+'</div>'+
+          '<span style="font-size:.76rem;padding:2px 8px;border-radius:20px;background:#ffe0e6;color:#c00;">❌ Refusé</span>'+
+          (sl.refusal_comment?'<div style="font-size:.8rem;color:#666;margin-top:6px;">💬 Motif : '+sl.refusal_comment+'</div>':'')+'</div></div></div>';
+      }).join(''):'');
   });
 }
 function cancelStartup(slotId){
@@ -797,8 +861,11 @@ function pgStartups(el){
     (res.data||[]).map(function(s){
       var sj=encodeURIComponent(JSON.stringify({id:s.id,name:s.name,sector:s.sector||'',contact:s.contact||'',email:s.email||''}));
       return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">'+
+        '<div style="display:flex;gap:12px;align-items:center;">'+
+        (s.logo_url?'<img src="'+s.logo_url+'" style="width:48px;height:48px;border-radius:8px;object-fit:contain;border:1px solid var(--border);background:#f9f9f9;flex-shrink:0;"/>':
+          '<div style="width:48px;height:48px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">🚀</div>')+
         '<div><div style="font-weight:700;">'+s.name+' <span class="badge badge-green">'+(s.sector||'')+'</span></div>'+
-        '<div style="font-size:.8rem;color:var(--muted);">'+(s.contact||'')+' · '+(s.email||'')+'</div></div>'+
+        '<div style="font-size:.8rem;color:var(--muted);">'+(s.contact||'')+(state.role==='admin'?' · '+(s.email||''):'')+'</div></div></div>'+
         '<button class="btn btn-sm" style="background:#f0f0f0;" onclick="editStartup(decodeURIComponent(\''+sj+'\'))">✏️</button></div>';
     }).join('');
   });
