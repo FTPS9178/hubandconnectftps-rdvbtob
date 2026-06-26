@@ -359,7 +359,11 @@ function loadUser(user){
 }
 
 function finishLoad(profile){
-  var lbl=ge('userLabel');if(lbl)lbl.textContent=profile.name||state.user.email;
+  // Afficher le nom de la société (partner ou startup) plutôt que le profil
+  var entityName=state.role==='partner'&&state.partner?state.partner.name:
+                 state.role==='startup'&&state.startup?state.startup.name:
+                 profile.name||state.user.email;
+  var lbl=ge('userLabel');if(lbl)lbl.textContent=entityName;
   showPage('app');renderNav();loadTicker();
   navigateTo(profile.role==='admin'?'dashboard':profile.role==='partner'?'myPlanning':'partners');
   subscribeRealtime();
