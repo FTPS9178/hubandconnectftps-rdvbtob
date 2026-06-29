@@ -276,6 +276,7 @@ function doRegister(role){
   var existingId=val('rExisting'),societe=val('rSociete'),secteur=val('rSecteur'),desc=val('rDesc');
   var inviteCode=val('rInviteCode');
   if(!contact||!email||!pass){setMsg('Remplissez tous les champs.','warn');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setMsg('Email invalide.','warn');return;}
   if(!existingId&&(!societe||!secteur)){setMsg('Renseignez la société et le secteur.','warn');return;}
   if(pass!==pass2){setMsg('Mots de passe différents.','warn');return;}
   if(pass.length<6){setMsg('Mot de passe trop court.','warn');return;}
@@ -344,7 +345,14 @@ function logout(){
 
 function loadUser(user){
   sb.from('profiles').select('*').eq('id',user.id).single().then(function(res){
-    if(res.error||!res.data){setMsg('❌ Profil introuvable.','error');return;}
+    if(res.error||!res.data){
+      if(res.error&&res.error.message&&res.error.message.indexOf('JWT')>=0){
+        // Session expirée
+        sb.auth.signOut().then(function(){showPage('login');showLogin();setMsg('⚠️ Session expirée. Reconnectez-vous.','warn');});
+        return;
+      }
+      setMsg('❌ Profil introuvable.','error');return;
+    }
     var profile=res.data;
     state.user=user;state.profile=profile;state.role=profile.role;
     if(profile.role==='partner'){
@@ -376,8 +384,53 @@ function finishLoad(profile){
 
 function checkSession(){
   sb.auth.getSession().then(function(res){
-    if(res.data&&res.data.session){loadUser(res.data.session.user);}
-    else{showLogin();}
+    if(res.data&&res.data.session){
+      // Vérifier si c'est un lien de réinitialisation de mot de passe
+      var hash=window.location.hash;
+      if(hash&&hash.indexOf('type=recovery')>=0){
+        showPasswordReset();
+        return;
+      }
+      loadUser(res.data.session.user);
+    } else {
+      // Vérifier si c'est un lien de réinitialisation sans session active
+      var hash=window.location.hash;
+      if(hash&&hash.indexOf('type=recovery')>=0){
+        showPasswordReset();
+        return;
+      }
+      showLogin();
+    }
+  });
+}
+
+function showPasswordReset(){
+  showPage('login');
+  ge('authForm').innerHTML=
+    '<div class="alert alert-info" style="font-size:.82rem;margin-bottom:14px;">🔐 Définissez votre nouveau mot de passe.</div>'+
+    '<div class="form-group"><label>Nouveau mot de passe</label>'+
+    '<div class="pw-wrap"><input id="newPass" type="password" placeholder="Min. 6 caractères" autocomplete="new-password"/>'+
+    '<button class="pw-eye" onclick="togglePw(\'newPass\',this)" type="button">👁</button></div></div>'+
+    '<div class="form-group"><label>Confirmer le mot de passe</label>'+
+    '<div class="pw-wrap"><input id="newPass2" type="password" placeholder="••••••••" autocomplete="new-password"/>'+
+    '<button class="pw-eye" onclick="togglePw(\'newPass2\',this)" type="button">👁</button></div></div>'+
+    '<button class="btn btn-primary" style="width:100%;" onclick="doPasswordReset()">Enregistrer →</button>';
+  ge('tabLogin').style.display='none';
+  ge('tabRegister').style.display='none';
+}
+
+function doPasswordReset(){
+  var pass=ge('newPass')?ge('newPass').value:'';
+  var pass2=ge('newPass2')?ge('newPass2').value:'';
+  if(!pass||pass.length<6){setMsg('Mot de passe trop court (6 caractères min).','warn');return;}
+  if(pass!==pass2){setMsg('Les mots de passe ne correspondent pas.','warn');return;}
+  sb.auth.updateUser({password:pass}).then(function(r){
+    if(r.error){setMsg('❌ '+r.error.message,'error');return;}
+    setMsg('✅ Mot de passe mis à jour ! Connectez-vous.','success');
+    ge('tabLogin').style.display='';
+    ge('tabRegister').style.display='';
+    window.location.hash='';
+    showLogin();
   });
 }
 
@@ -393,8 +446,11 @@ function loadTicker(){
   });
 }
 
+var realtimeChannel=null;
 function subscribeRealtime(){
-  sb.channel('rt').on('postgres_changes',{event:'UPDATE',schema:'public',table:'slots'},function(){
+  if(realtimeChannel){sb.removeChannel(realtimeChannel);}
+  realtimeChannel=sb.channel('rt_'+Date.now());
+  realtimeChannel.on('postgres_changes',{event:'UPDATE',schema:'public',table:'slots'},function(){
     var el=document.querySelector('[data-page]');
     if(el&&['myPlanning','partners','myRdv','myRdvStartup'].indexOf(el.dataset.page)>=0){navigateTo(el.dataset.page);}
   }).subscribe();
